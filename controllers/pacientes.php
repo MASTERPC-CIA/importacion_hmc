@@ -27,7 +27,7 @@ class Pacientes extends MX_Controller {
     function __construct() {
         parent::__construct();
         //NOTA  Nacionalidades tiene un formato de registro diferente en el excel
-        $this->nacionalidades_list = $this->generic_model->get('nacionalidad', array('id >' => '0'), 'id, nombre');
+        $this->nacionalidades_list = $this->generic_model->get('nacionalidad', array('id >' => '0', 'id <'=>'5'), 'id, SUBSTRING(nombre,1,3)nombre');
         //NOTA  Provincias con Ñ mayuscula no verifica coincidencias
         $this->provincias_list = $this->generic_model->get('bill_provincia', array('idProvincia >' => '0'), 'idProvincia id, descripProv nombre');
         $this->cantones_list = $this->generic_model->get('bill_canton', array('idCanton >' => '0'), 'idCanton id, descripCtn nombre');
@@ -50,7 +50,8 @@ class Pacientes extends MX_Controller {
 
     function importar() {
         $string = $this->input->post('string');
-        $this->get_coincidencias($string, $this->unidades_list, 'Unidad');
+        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
+//        $this->get_coincidencias($string, $this->unidades_list, 'Unidad');
     }
 
     function importar1() {
@@ -222,6 +223,29 @@ class Pacientes extends MX_Controller {
             echo error_info_msg('El string "' . $string . '" de ' . $subject . ' no se encuentra registrado en el sistema, o el nombre no coincide');
                 $this->db->trans_rollback();
             die();
+        }
+    }
+    
+    function get_nacionalidadId($string, $list, $subject='') {
+        print_r($list);
+//        die();
+        $string = substr($string, 0, 3);
+        $encontrado = false;
+        echo tagcontent('script', '$("#p_subject").text("'.$subject.'")');
+
+        foreach ($list as $value) {
+            echo tagcontent('script', '$("#p_id").text("'.$value->id.'")');
+            if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
+                $encontrado = true;
+                break;
+            }
+        }
+
+        if ($encontrado) {
+//            echo 'id = ' . $value->id;
+            return $value->id;
+        } else {
+            return '-1';
         }
     }
 
