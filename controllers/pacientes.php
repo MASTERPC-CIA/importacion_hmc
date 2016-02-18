@@ -34,9 +34,10 @@ class Pacientes extends MX_Controller {
         //NOTA se requiere nueva funcion para extraer id sexo
         $this->sexo_list = $this->generic_model->get('cliente_sexo', array('id >' => '0'), 'id, SUBSTRING(nombre,1,1)nombre');
         //NOTA se requiere nueva funcion para extraer id estado civil
-        $this->estado_civil_list = $this->generic_model->get('cliente_estado_civil', array('id >' => '0'), 'id, nombre');
+        $this->estado_civil_list = $this->generic_model->get('cliente_estado_civil', array('id >' => '0'), 'id, SUBSTRING(nombre,1,1)nombre');
+        //NOTA se requiere nueva funcion para extraer grado_id para militar y para familiar
         $this->grado_list = $this->generic_model->get('cliente_grado', array('id >' => '0'), 'id, nombre');
-        //NOTA se requiere nueva funcion para extraer id unidad
+        //NOTA se requiere nueva funcion para extraer id unidad para militar y para familiar
         $this->unidades_list = $this->generic_model->get('unidad_ffaa', array('id >' => '0'), 'id, uni_nombre_abr nombre');
     }
 
@@ -54,7 +55,7 @@ class Pacientes extends MX_Controller {
 //        die();
 //        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
 //        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
-        $this->get_sexoId($string, $this->sexo_list, 'Setso');
+        echo $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
     }
 
     function importar1() {
@@ -265,6 +266,32 @@ class Pacientes extends MX_Controller {
     }
     
     function get_sexoId($string, $list, $subject = '') {
+//        print_r($list);
+        $encontrado = false;
+        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
+        
+        //Si esta vacio retornamos -1
+        if(empty($string)){
+            return '-1';
+        }
+        
+        foreach ($list as $value) {
+            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
+            if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
+                $encontrado = true;
+                
+                break;
+            }
+        }
+
+        if ($encontrado) {
+//            echo 'id = ' . $value->id;
+            return $value->id;
+        } else {
+            return '-1';
+        }
+    }
+    function get_estadoCivilId($string, $list, $subject = '') {
 //        print_r($list);
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
