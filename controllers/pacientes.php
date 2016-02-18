@@ -28,12 +28,11 @@ class Pacientes extends MX_Controller {
         parent::__construct();
         //NOTA  Nacionalidades tiene un formato de registro diferente en el excel
         $this->nacionalidades_list = $this->generic_model->get('nacionalidad', array('id >' => '0', 'id <' => '5'), 'id, SUBSTRING(nombre,1,3)nombre');
-        //NOTA  Provincias con Ñ mayuscula no verifica coincidencias
         $this->provincias_list = $this->generic_model->get('bill_provincia', array('idProvincia >' => '0'), 'idProvincia id, descripProv nombre');
         $this->cantones_list = $this->generic_model->get('bill_canton', array('idCanton >' => '0'), 'idCanton id, descripCtn nombre');
         $this->parroquias_list = $this->generic_model->get('bill_parroquia', array('idParroquia >' => '0'), 'idParroquia id, descripPq nombre');
         //NOTA se requiere nueva funcion para extraer id sexo
-        $this->sexo_list = $this->generic_model->get('cliente_sexo', array('id >' => '0'), 'id, nombre');
+        $this->sexo_list = $this->generic_model->get('cliente_sexo', array('id >' => '0'), 'id, SUBSTRING(nombre,1,1)nombre');
         //NOTA se requiere nueva funcion para extraer id estado civil
         $this->estado_civil_list = $this->generic_model->get('cliente_estado_civil', array('id >' => '0'), 'id, nombre');
         $this->grado_list = $this->generic_model->get('cliente_grado', array('id >' => '0'), 'id, nombre');
@@ -54,7 +53,8 @@ class Pacientes extends MX_Controller {
 //        echo $date;
 //        die();
 //        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
-        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
+//        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
+        $this->get_sexoId($string, $this->sexo_list, 'Setso');
     }
 
     function importar1() {
@@ -210,7 +210,12 @@ class Pacientes extends MX_Controller {
 //        print_r($list);
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
-
+        
+//Si esta vacio retornamos -1
+        if(empty($string)){
+            return '-1';
+        }
+        
         foreach ($list as $value) {
             echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
@@ -239,10 +244,41 @@ class Pacientes extends MX_Controller {
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
+        if(empty($string)){
+            return '-1';
+        }
+        
         foreach ($list as $value) {
             echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
                 $encontrado = true;
+                break;
+            }
+        }
+
+        if ($encontrado) {
+//            echo 'id = ' . $value->id;
+            return $value->id;
+        } else {
+            return '-1';
+        }
+    }
+    
+    function get_sexoId($string, $list, $subject = '') {
+//        print_r($list);
+        $encontrado = false;
+        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
+        
+        //Si esta vacio retornamos -1
+        if(empty($string)){
+            return '-1';
+        }
+        
+        foreach ($list as $value) {
+            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
+            if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
+                $encontrado = true;
+                
                 break;
             }
         }
