@@ -129,10 +129,10 @@ class Pacientes extends MX_Controller {
                 $correo = get_value_xls($PHPExcel, 50, $x); // email
                 
                // Valores a guardar en la tabla billiong_cliente
-//                echo $fecha_nac." longitud ".strlen($fecha_nac);
-//                if(strlen($fecha_nac)<10){
-//                    $fecha_nac='';
-//                }
+                echo $fecha_nac." longitud ".strlen($fecha_nac);
+                if(strlen($fecha_nac)<10){
+                    $fecha_nac='';
+                }
                 $data = array(
                     'PersonaComercio_cedulaRuc'=>$cedula,
                     'nombres'=>$nombre,
