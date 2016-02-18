@@ -14,7 +14,7 @@
 
 
                     echo Open('div', array('class' => 'col-md-3')); 
-                        echo tagcontent('button','Importar',array( 'id'=>'ajaxformbtn','data-target'=>'new_deposito_out','class'=>'btn btn-primary'));
+                        echo tagcontent('button','Importar',array( 'id'=>'ajaxformbtn','data-target'=>'pacientes_out','class'=>'btn btn-primary'));
                     echo Close('div'); 
                     
                     echo  input(array('type' => 'hidden', 'name' => 'action', 
@@ -23,12 +23,6 @@
                 echo Close('div'); 
 	echo Close('form');
 
-	echo tagcontent('div','',array('id'=>'new_deposito_out'));
+	echo tagcontent('div','',array('id'=>'pacientes_out'));
         echo tagcontent('div','',array('id'=>'new_total_out'));
 //	echo tagcontent('div','',array('id'=>'new_deposito_out'));
-
-
-$jsarray = array(
-    base_url('application/modules/bancos/js/deposito_cheques.js'),
-);
-echo jsload($jsarray);
