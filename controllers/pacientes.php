@@ -23,7 +23,7 @@ class Pacientes extends MX_Controller {
     }
 
     function importar() {
-        $upload_path = './uploads/cheques';
+        $upload_path = './uploads/pacientes';
 //        $this->get_idbanco($nombre_banco);
         $this->loadfromfile($upload_path);
     }
@@ -60,14 +60,14 @@ class Pacientes extends MX_Controller {
 
         $upl_data = $this->upload->data();
 //        $upl_data['file_name'];
-        $this->get_chequesdata_xls($upl_data);
+        $this->get_pacientesdata_xls($upl_data);
     }
 
-    function get_chequesdata_xls($xls_data) {
-        if (file_exists('./uploads/cheques/' . $xls_data['file_name'])) {
+    function get_pacientesdata_xls($xls_data) {
+        if (file_exists('./uploads/pacientes/' . $xls_data['file_name'])) {
             // Cargando la hoja de c�lculo
             $Reader = new PHPExcel_Reader_Excel2007();
-            $PHPExcel = $Reader->load('./uploads/cheques/' . $xls_data['file_name']);
+            $PHPExcel = $Reader->load('./uploads/pacientes/' . $xls_data['file_name']);
             // Asignar hoja de excel activa
             $PHPExcel->setActiveSheetIndex(0);
             $bancos_list['data'] = $this->generic_model->get('billing_banco', array('id >' => '0'), 'id, nombre banco');
