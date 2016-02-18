@@ -15,7 +15,33 @@ if (!defined('BASEPATH'))
  */
 class Pacientes extends MX_Controller {
 
-   function index() {
+    private $nacionalidades_list;
+    private $provincias_list;
+    private $cantones_list;
+    private $parroquias_list;
+    private $sexo_list;
+    private $estado_civil_list;
+    private $grado_list;
+    private $unidades_list;
+
+    function __construct() {
+        parent::__construct();
+        //NOTA  Nacionalidades tiene un formato de registro diferente en el excel
+        $this->nacionalidades_list = $this->generic_model->get('nacionalidad', array('id >' => '0'), 'id, nombre');
+        //NOTA  Provincias con Ñ mayuscula no verifica coincidencias
+        $this->provincias_list = $this->generic_model->get('bill_provincia', array('idProvincia >' => '0'), 'idProvincia id, descripProv nombre');
+        $this->cantones_list = $this->generic_model->get('bill_canton', array('idCanton >' => '0'), 'idCanton id, descripCtn nombre');
+        $this->parroquias_list = $this->generic_model->get('bill_parroquia', array('idParroquia >' => '0'), 'idParroquia id, descripPq nombre');
+        //NOTA se requiere nueva funcion para extraer id sexo
+        $this->sexo_list = $this->generic_model->get('cliente_sexo', array('id >' => '0'), 'id, nombre');
+        //NOTA se requiere nueva funcion para extraer id estado civil
+        $this->estado_civil_list = $this->generic_model->get('cliente_estado_civil', array('id >' => '0'), 'id, nombre');
+        $this->grado_list = $this->generic_model->get('cliente_grado', array('id >' => '0'), 'id, nombre');
+        //NOTA se requiere nueva funcion para extraer id unidad
+        $this->unidades_list = $this->generic_model->get('unidad_ffaa', array('id >' => '0'), 'id, uni_nombre_abr nombre');
+    }
+
+    function index() {
         $res['title'] = 'Importar Pacientes';
         $res['view'] = $this->load->view('pacientes_view', '', TRUE);
         $res['slidebar'] = $this->load->view('slidebar_lte', '', TRUE);
@@ -23,6 +49,11 @@ class Pacientes extends MX_Controller {
     }
 
     function importar() {
+        $string = $this->input->post('string');
+        $this->get_coincidencias($string, $this->unidades_list, 'Unidad');
+    }
+
+    function importar1() {
         $upload_path = './uploads/pacientes';
 //        $this->get_idbanco($nombre_banco);
         $this->loadfromfile($upload_path);
@@ -80,12 +111,12 @@ class Pacientes extends MX_Controller {
                 $timestamp = PHPExcel_Shared_Date::ExcelToPHP($fecha_emision);//Formateamos la fecha de xls a php
                 $fecha_php = date("Y-m-d", $timestamp);
                 $fecha_emision_php = date('Y-m-d', strtotime("$fecha_php + 1 day"));
-                
+
                 $fecha_cobro = get_value_xls($PHPExcel, 2, $x);
                 $timestamp = PHPExcel_Shared_Date::ExcelToPHP($fecha_cobro);//Formateamos la fecha de xls a php
                 $fecha_php = date("Y-m-d", $timestamp);
                 $fecha_cobro_php = date('Y-m-d', strtotime("$fecha_php + 1 day"));
-                
+
                 $nro = get_value_xls($PHPExcel, 3, $x);
                 $valor = get_value_xls($PHPExcel, 4, $x);
                 $banco_id = $this->get_idbanco(get_value_xls($PHPExcel, 5, $x), $bancos_list);
@@ -171,8 +202,27 @@ class Pacientes extends MX_Controller {
         }
     }
 
+    function get_coincidencias($string, $list, $subject = '') {
+//        print_r($list);
+        $encontrado = false;
+        echo tagcontent('script', '$("#p_subject").text("'.$subject.'")');
 
-    
-    
+        foreach ($list as $value) {
+            echo tagcontent('script', '$("#p_id").text("'.$value->id.'")');
+            if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
+                $encontrado = true;
+                break;
+            }
+        }
+
+        if ($encontrado) {
+//            echo 'id = ' . $value->id;
+            return $value->id;
+        } else {
+            echo error_info_msg('El string "' . $string . '" de ' . $subject . ' no se encuentra registrado en el sistema, o el nombre no coincide');
+                $this->db->trans_rollback();
+            die();
+        }
+    }
 
 }
