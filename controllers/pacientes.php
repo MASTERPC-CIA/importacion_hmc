@@ -125,7 +125,7 @@ class Pacientes extends MX_Controller {
             $this->db->trans_commit();
         }
     }
-
+// Funcion de busqueda de coincidencias por medio de un array 
     function get_idbanco($nombre_banco, $bancos_list) {
 //        print_r($bancos_list['data']);
 

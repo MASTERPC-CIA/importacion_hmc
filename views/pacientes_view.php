@@ -1,5 +1,5 @@
 <?php
-	echo Open('form', array('action'=>base_url('bancos/ch_pago_import/importar'),'method'=>'post'));
+	echo Open('form', array('action'=>base_url('importacion_hmc/pacientes/get_pacientesdata_xls'),'method'=>'post'));
 //		echo tagcontent('h1','DEPOSITOS - Cheques',array('class'=>'titulos'));
 
                 echo Open('div', array('class' => 'col-md-6')); 
