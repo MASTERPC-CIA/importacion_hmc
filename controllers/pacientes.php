@@ -143,11 +143,11 @@ class Pacientes extends MX_Controller {
                 $ciud_pac = get_value_xls($PHPExcel, 16, $x); // parroquia_id
                 $calle_pac = get_value_xls($PHPExcel, 17, $x); // direccion
                 $telef_pac = get_value_xls($PHPExcel, 18, $x); // telefonos
-                $nomb_fam = get_value_xls($PHPExcel, 19, $x); // familair_nombre
-                $rela_fam = get_value_xls($PHPExcel, 20, $x); // familair_parentesco
+                $nomb_fam = get_value_xls($PHPExcel, 19, $x); // familiar_nombre
+                $rela_fam = get_value_xls($PHPExcel, 20, $x); // familiar_parentesco
                 
-                $calle_fam = get_value_xls($PHPExcel, 24, $x); // familair_direccion
-                $telef_fam = get_value_xls($PHPExcel, 25, $x); // familair_telefono
+                $calle_fam = get_value_xls($PHPExcel, 24, $x); // familiar_direccion
+                $telef_fam = get_value_xls($PHPExcel, 25, $x); // familiar_telefono
                 $ci_tit = get_value_xls($PHPExcel, 26, $x); // ci_titular
                 
                 $siguni = get_value_xls($PHPExcel, 37, $x); // unidad_id => en caso de que el paciente sea militar
@@ -185,6 +185,7 @@ class Pacientes extends MX_Controller {
                     'familiar_direccion'=>  $calle_fam,
                     'familiar_telefono'=>  $telef_fam,
                     'familiar_telefono'=>  $telef_fam,
+                    'aseguradora_id'=>  get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
 //                    'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
                     
@@ -374,6 +375,7 @@ class Pacientes extends MX_Controller {
         }
     }
 
+    /*Guarda los strings que no se pudieron guardar por mala digitacion del usuario, para tener respaldo.  JLQ*/
     function save_incidentes($string, $subject, $num_archivo_paciente) {
         $data = array(
             'string' => $string,
@@ -382,5 +384,30 @@ class Pacientes extends MX_Controller {
         );
         $this->generic_model->save('incidentes_importacion', $data);
     }
-
+    
+    /*Extrae la aseguradora segun los campos del excel. JLQ*/
+    function get_aseguradoraId($convenio_id, $es_iess, $es_issfa, $es_isspol, $es_otros) {
+        //Si el convenio coincide del 1 - 9, se graba directo el id
+        if($convenio_id >= 1 && $convenio_id <=9){
+            return $convenio_id;
+        }
+        //Si esta vacio buscamos en los campos restantes
+        else if(empty ($convenio_id)){
+            if($es_iess == 'VERDADERO'){
+                return '3';//Id 3: IESS, seguro voluntario
+            }
+            else if($es_issfa == 'VERDADERO'){
+                return '1';//Id 1: Seguro ISSFA
+            }
+            else if($es_isspol == 'VERDADERO'){
+                return '2';//Id 2: Seguro ISSPOL
+            }
+            else if($es_otros == 'VERDADERO'){
+                return '-1';//Id -1: Otros seguros
+            }
+            else {//Si no coincide ninguno enviamos -2: NINGUNA
+                return '-2';
+            }
+        }
+    }
 }
