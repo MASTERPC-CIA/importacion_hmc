@@ -186,6 +186,7 @@ class Pacientes extends MX_Controller {
                     'familiar_direccion'=>  $calle_fam,
                     'familiar_telefono'=>  $telef_fam,
                     'familiar_telefono'=>  $telef_fam,
+                    'aseguradora_id' => get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
                     'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
                     'grado_id'=> $this->get_grado_id($tarifa,$this->grado_list,$nomgra,$nomgrat,$x/*numero de fila del archivo excel*/),
