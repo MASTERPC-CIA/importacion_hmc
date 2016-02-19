@@ -1,7 +1,7 @@
 <?php
 	echo Open('form', array('id'=>'import_form', 'action'=>base_url('importacion_hmc/pacientes/importar'),'method'=>'post'));
 //		echo tagcontent('h1','DEPOSITOS - Cheques',array('class'=>'titulos'));
-
+        
                 echo Open('div', array('class' => 'col-md-6')); 
                 
                     echo tagcontent('label', 'Archivo Excel');
