@@ -188,7 +188,12 @@ class Pacientes extends MX_Controller {
                     'familiar_telefono'=>  $telef_fam,
                     'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
-                    'grado_id'=> $this->get_grado_id($tarifa,$this->grado_list,$nomgra,$nomgrat,$x/*numero de fila del archivo excel*/),
+                    
+                    // la funcion solo se le especifica si es grado o unidad
+                    'grado_id'=> $this->get_grado_id_unidad_id($tarifa,$this->grado_list,$nomgra,$nomgrat
+                ,null,null,null,1,$x),
+                    'unidad_id'=> $this->get_grado_id_unidad_id($tarifa,null,null,null
+                ,$this->unidades_list,$siguni,$sigunit,0,$x),
                     
                 );
                 print_r($data);
