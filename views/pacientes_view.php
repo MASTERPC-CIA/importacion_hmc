@@ -1,5 +1,6 @@
 <?php
 	echo Open('form', array('id'=>'import_form', 'action'=>base_url('importacion_hmc/pacientes/importar'),'method'=>'post'));
+//	echo Open('form', array('id'=>'import_form', 'action'=>base_url('importacion_hmc/pacientes/importar1'),'method'=>'post'));
 //		echo tagcontent('h1','DEPOSITOS - Cheques',array('class'=>'titulos'));
         
                 echo Open('div', array('class' => 'col-md-6')); 
@@ -10,6 +11,7 @@
 //                            'class' => 'form-control col-md-3')));
 
                     echo Open('div', array('class' => 'row')); 
+                    // campo de excel funcional 
 //                    echo Open('input', array('type'=>'file','name' => 'userfile', 'class' => 'col-md-6')); 
                     echo Open('input', array('type'=>'text','name' => 'string', 'class' => 'col-md-6')); 
 

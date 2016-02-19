@@ -71,7 +71,7 @@ class Pacientes extends MX_Controller {
     }
 
     function importar1() {
-        $upload_path = './uploads/pacientes';
+        $upload_path = 'pacientes';
 //        $this->get_idbanco($nombre_banco);
         $this->loadfromfile($upload_path);
     }
@@ -181,7 +181,7 @@ class Pacientes extends MX_Controller {
                     'fecha'=>$fecha_aper,
                     'num_archivo'=>$numero,
                     'user_id'=>  $this->user->id,
-                    'fecha_nacimiento'=>date_format(date_create($fecha_nac), 'Y-m-d'),
+                    'fecha_nacimiento'=>  $this->verificar_fecha($fecha_nac),
                     'ocupacion'=>  $ocupacion,
                     'familiar_nombre'=>  $nomb_fam,
                     'familiar_parentesco'=>  $rela_fam,
