@@ -23,6 +23,7 @@ class Pacientes extends MX_Controller {
     private $estado_civil_list;
     private $grado_list;
     private $unidades_list;
+    private $tarifa_cliente_tipo_list;
 
     function __construct() {
         parent::__construct();
@@ -39,6 +40,8 @@ class Pacientes extends MX_Controller {
         $this->grado_list = $this->generic_model->get('cliente_grado', array('id >' => '0'), 'id, nombre');
         //NOTA se requiere nueva funcion para extraer id unidad para militar y para familiar
         $this->unidades_list = $this->generic_model->get('unidad_ffaa', array('id >' => '0'), 'id, uni_nombre_abr nombre');
+        // NOTA saco los tiposde clientes para saber cuales son activos pasivos y civiles
+//        $this->tarifa_cliente_tipo_list = $this->generic_model->get('billing_clientetipo', array('idclientetipo >' => '0'), 'idclientetipo id');
     }
 
     function index() {
@@ -55,7 +58,9 @@ class Pacientes extends MX_Controller {
 //        die();
 //        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
 //        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
-        $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
+//        $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
+        $id_estado = $this->ver_estado_militar($string);
+//        echo "id_estado ".$id_estado;
     }
 
     function importar1() {
@@ -187,6 +192,7 @@ class Pacientes extends MX_Controller {
                     'familiar_telefono'=>  $telef_fam,
                     'aseguradora_id'=>  get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
 //                    'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
+                    'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
                     
                 );
@@ -408,6 +414,19 @@ class Pacientes extends MX_Controller {
             else {//Si no coincide ninguno enviamos -2: NINGUNA
                 return '-2';
             }
+    //del 1 - 8 los pares pasivos y los impares son activos
+                    // primero pasar que tarifa nos ea mayor a 8 
+    function ver_estado_militar($id_tipocliente) {
+        if($id_tipocliente <= 8){
+            if($id_tipocliente %2==0){
+//                echo "Pasivo";
+                return 2;
+            }else{
+//                echo "Activo";
+                return 1;
+            }
+        }else{
+            return '-1';
         }
     }
 }
