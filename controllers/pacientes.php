@@ -25,6 +25,7 @@ class Pacientes extends MX_Controller {
     private $unidades_list;
     private $tarifa_cliente_tipo_list;
     private $archivo_name;
+    private $row_file;
 
     function __construct() {
         parent::__construct();
@@ -130,7 +131,9 @@ class Pacientes extends MX_Controller {
 
 
             for ($x = 2; $x <= $PHPExcel->getActiveSheet()->getHighestRow(); $x++) {
-
+                
+                $this->row_file = $x;
+                
                 $numero = get_value_xls($PHPExcel, 0, $x); // numero de archivo
                 $cedula = get_value_xls($PHPExcel, 1, $x); // PersonaComercio_cedulaRuc
                 $tarjeta = get_value_xls($PHPExcel, 2, $x); // codigo_issfa
@@ -209,7 +212,7 @@ class Pacientes extends MX_Controller {
                     'parroquia_id'=>  $this->get_coincidencias($ciud_pac, $this->parroquias_list, $x,"Parroquia"),
                     
                 );
-                print_r($data);
+//                print_r($data);
 //                if ($this->cheque_existe($nro, $banco_id)) {
 //                    echo warning_msg('Ha ocurrido un problema al grabar');
 //                    die();
@@ -284,7 +287,7 @@ class Pacientes extends MX_Controller {
         }
     }
 // CADENA, LISTA, NUMERO DE FILADEL DOCUMENTOEXCEL, NOMBRE DELCAMPO DELDOCUMENTO EXCEL
-    function get_coincidencias($string, $list, $num_archivo, $subject = '',$coincidencia_mitad =0,$val_return = '-1') {
+    function get_coincidencias($string, $list, $num_archivo, $subject = '',$coincidencia_mitad =0,$val_return = '-1',$tabla='') {
 //        print_r($list);
         $string = trim($string);
         $encontrado = false;
@@ -336,7 +339,7 @@ class Pacientes extends MX_Controller {
 //            $this->db->trans_rollback();
 //            die();
             /* FUNCION PARA GUARDAR INCIDENTES QUE NO SE PUDIERON GRABAR */
-            $this->save_incidentes($string,$num_archivo,$subject, $this->archivo_name);
+            $this->save_incidentes($string,$num_archivo,$subject, $this->archivo_name,$tabla);
             return $val_return;
         }
     }
@@ -344,6 +347,8 @@ class Pacientes extends MX_Controller {
     function get_nacionalidadId($string, $list, $subject = '') {
 //        print_r($list);
 //        die();
+        
+        $string = trim($string);
         $string = substr($string, 0, 3);
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
@@ -370,6 +375,7 @@ class Pacientes extends MX_Controller {
 
     function get_sexoId($string, $list, $subject = '') {
 //        print_r($list);
+        $string = trim($string);
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
@@ -397,6 +403,7 @@ class Pacientes extends MX_Controller {
 
     function get_estadoCivilId($string, $list, $subject = '') {
 //        print_r($list);
+        $string = trim($string);
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
@@ -424,12 +431,13 @@ class Pacientes extends MX_Controller {
 
     /* Guarda los strings que no se pudieron guardar por mala digitacion del usuario, para tener respaldo.  JLQ */
 
-    function save_incidentes($string,$num_archivo,$subject, $archivo_name) {
+    function save_incidentes($string,$num_archivo,$subject, $archivo_name,$tabla) {
         $data = array(
             'string' => $string,
             'id_paciente_row_file' => $num_archivo,
             'campo' => $subject,
             'nombre_archivo' => $archivo_name,
+            'nom_tab_lista' => $tabla,
         );
         $this->generic_model->save($data,'incidentes_importacion');
     }
@@ -437,6 +445,9 @@ class Pacientes extends MX_Controller {
     /* Extrae la aseguradora segun los campos del excel. JLQ */
 
     function get_aseguradoraId($convenio_id, $es_iess, $es_issfa, $es_isspol, $es_otros) {
+        $es_issfa = trim($es_issfa);
+        $es_isspol = trim($es_isspol);
+        $es_otros = trim($es_otros);
         //Si el convenio coincide del 1 - 9, se graba directo el id
         if ($convenio_id >= 1 && $convenio_id <= 9) {
             return $convenio_id;
@@ -469,6 +480,7 @@ class Pacientes extends MX_Controller {
                 return 1;
             }
         } else {
+            $this->save_incidentes($id_tipocliente, $this->row_file,'tarifa', $this->archivo_name, "billing_clientetipo");
             return '-1';
         }
     }
@@ -478,16 +490,25 @@ class Pacientes extends MX_Controller {
     // para estos se salen mas de una cooncidencia se tomará la ultima y en caso de nada se envia -2
     function get_grado_id_unidad_id($tarifa,$grado_list=null,$nomgra=null,$nomgrat=null
             ,$unidad_list=null,$siguni=null,$sigunit=null,$es_grado=0/*si esta en sero significa q es unidad*/,$num_arch_excel=0){
+        
+        $nomgra = trim($nomgra);
+        $nomgrat = trim($nomgrat);
+        
+        $siguni = trim($siguni);
+        $sigunit = trim($sigunit);
+        
+        $tab_grado ="cliente_grado";
+        $tab_unidad ="unidad_ffaa";
         switch ($tarifa) {
             // MILITARES
             case 1:
                 if($es_grado == 1){
                     // saca el grado
-                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -495,11 +516,11 @@ class Pacientes extends MX_Controller {
             case 2:
                 if($es_grado == 1){
                     // saca el grado
-                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -507,11 +528,11 @@ class Pacientes extends MX_Controller {
             case 10:
                 if($es_grado == 1){
                     // saca el grado
-                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -519,11 +540,11 @@ class Pacientes extends MX_Controller {
             case 11:
                 if($es_grado == 1){
                     // saca el grado
-                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -531,11 +552,11 @@ class Pacientes extends MX_Controller {
             case 12:
                 if($es_grado == 1){
                     // saca el grado
-                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -545,11 +566,11 @@ class Pacientes extends MX_Controller {
             case 3:
                 if($es_grado == 1){
                     // saco elgrado del familair
-                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -557,11 +578,11 @@ class Pacientes extends MX_Controller {
             case 4:
                 if($es_grado == 1){
                     // saco elgrado del familair
-                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -569,11 +590,11 @@ class Pacientes extends MX_Controller {
             case 5:
                 if($es_grado == 1){
                     // saco elgrado del familair
-                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -581,11 +602,11 @@ class Pacientes extends MX_Controller {
             case 6:
                 if($es_grado == 1){
                     // saco elgrado del familair
-                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -593,11 +614,11 @@ class Pacientes extends MX_Controller {
             case 7:
                 if($es_grado == 1){
                     // saco elgrado del familair
-                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -605,11 +626,11 @@ class Pacientes extends MX_Controller {
             case 8:
                 if($es_grado == 1){
                     // saco elgrado del familair
-                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -617,11 +638,11 @@ class Pacientes extends MX_Controller {
             case 9:
                 if($es_grado == 1){
                     // saco elgrado del familair
-                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -629,11 +650,11 @@ class Pacientes extends MX_Controller {
             case 13:
                 if($es_grado == 1){
                     // saco elgrado del familair
-                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat',0,'-1',$tab_grado);
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1,'-2',$tab_unidad);
                     return $id_unidad;
                 }
 
@@ -647,8 +668,8 @@ class Pacientes extends MX_Controller {
     // verifico si la fecha esta en un formato dia-sep-12 si esta cuakquier otro valor remplazo x null o empty (aun x definir )
     function verificar_fecha($string) {
         $array_fecha = explode('-',$string);
-        print_r($string);
-        echo "<br>";
+//        print_r($string);
+//        echo "<br>";
         if(sizeof($array_fecha)>1){
             $fecha = date_format(date_create($string), 'Y-m-d');
             return $fecha;
