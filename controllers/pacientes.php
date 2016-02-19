@@ -63,7 +63,7 @@ class Pacientes extends MX_Controller {
         $id_grado= $this->get_grado_id_unidad_id($string,$this->grado_list,"SGOP","CBOS"
                 ,null,null,null,1,0);
         $id_unidad= $this->get_grado_id_unidad_id($string,null,null,null
-                ,$this->unidades_list,"HT-III","HG III-DE",0,0);
+                ,$this->unidades_list,"HT-III","III-DE",0,0);
         echo "id_grado ".$id_grado;
         echo "<br>id_unidad ".$id_unidad;
     }
@@ -266,9 +266,11 @@ class Pacientes extends MX_Controller {
         }
     }
 // CADENA, LISTA, NUMERO DE FILADEL DOCUMENTOEXCEL, NOMBRE DELCAMPO DELDOCUMENTO EXCEL
-    function get_coincidencias($string, $list, $num_archivo, $subject = '') {
+    function get_coincidencias($string, $list, $num_archivo, $subject = '',$coincidencia_mitad =0) {
 //        print_r($list);
         $encontrado = false;
+    //  id para sacar el registro decoincidencias intermedias
+        $id_reg =0;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
 //Si esta vacio retornamos -1
@@ -277,17 +279,39 @@ class Pacientes extends MX_Controller {
         }
         
                 echo tagcontent('script', 'console.log("'.$string.'");');
+//            print_r($string);
         foreach ($list as $value) {
             echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
 //                echo tagcontent('script', 'console.log("'.$value->nombre.'");');
-            if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
-                $encontrado = true;
-                break;
+            
+            // estas comparacion s ela hará solo para la datos que las coincidencias no estan ni al inicio ni al fin ni tienen la misma longitud
+            if($coincidencia_mitad == 1){
+                $array_concidencias_string = explode($string, $value->nombre);// en casode que hayan espacios se va por url con %20 y por mediod e eso losdivide 
+
+                $aux = 0;
+                $id_reg =0;
+                if(sizeof($array_concidencias_string)>1){
+                    $aux = $value->id;
+                    if($aux > $id_reg){
+                        $id_reg = $aux;
+                        $encontrado = true;
+                    }
+                }
+            }elseif($coincidencia_mitad == 0){
+                if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
+                    $id_reg = $value->id;
+                    $encontrado = true;
+                    break;
+                }
             }
         }
+//        echo "<br><h1>hay coincidencia</h1><br>".$id_reg;
+//        die();
         if ($encontrado) {
-            return $value->id;
+            return $id_reg;
         } else {
+            
+            // OJO para unidad va -2
             echo error_info_msg('El string "' . $string . '" de ' . $subject . ' no se encuentra registrado en el sistema, o el nombre no coincide');
 
             $this->db->trans_rollback();
@@ -443,7 +467,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1);
                     return $id_unidad;
                 }
 
@@ -455,7 +479,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1);
                     return $id_unidad;
                 }
 
@@ -467,7 +491,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1);
                     return $id_unidad;
                 }
 
@@ -479,7 +503,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1);
                     return $id_unidad;
                 }
 
@@ -491,7 +515,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saca la unidad
-                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni',1);
                     return $id_unidad;
                 }
 
@@ -505,7 +529,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1);
                     return $id_unidad;
                 }
 
@@ -517,7 +541,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1);
                     return $id_unidad;
                 }
 
@@ -529,7 +553,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1);
                     return $id_unidad;
                 }
 
@@ -541,7 +565,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1);
                     return $id_unidad;
                 }
 
@@ -553,7 +577,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1);
                     return $id_unidad;
                 }
 
@@ -565,7 +589,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1);
                     return $id_unidad;
                 }
 
@@ -577,7 +601,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1);
                     return $id_unidad;
                 }
 
@@ -589,7 +613,7 @@ class Pacientes extends MX_Controller {
                     return $id_grado;
                 }else{
                     // saco la unidad del familiar
-                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit',1);
                     return $id_unidad;
                 }
 
@@ -599,4 +623,5 @@ class Pacientes extends MX_Controller {
                 break;
         }
     }
+
 }
