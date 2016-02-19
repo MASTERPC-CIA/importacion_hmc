@@ -55,7 +55,7 @@ class Pacientes extends MX_Controller {
 //        die();
 //        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
 //        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
-        echo $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
+        $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
     }
 
     function importar1() {
