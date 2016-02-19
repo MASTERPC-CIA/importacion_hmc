@@ -195,6 +195,7 @@ class Pacientes extends MX_Controller {
                     'familiar_telefono'=>  $telef_fam,
                     'codigo_issfa'=>  $tarjeta,
                     'ci_titular'=>  $ci_tit,
+                    'clientetipo_idclientetipo'=>  $tarifa,
                     'aseguradora_id' => $this->get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
                     // Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
@@ -480,8 +481,17 @@ class Pacientes extends MX_Controller {
                 return 1;
             }
         } else {
-            $this->save_incidentes($id_tipocliente, $this->row_file,'tarifa', $this->archivo_name, "billing_clientetipo");
-            return '-1';
+            switch ($id_tipocliente) {
+                case 10:
+//                echo "Activo";
+                return 1;
+                    break;
+
+                default:
+                    $this->save_incidentes($id_tipocliente, $this->row_file,'tarifa', $this->archivo_name, "billing_clientetipo");
+                    return '-1';
+                    break;
+            }
         }
     }
     
