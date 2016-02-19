@@ -286,20 +286,21 @@ class Pacientes extends MX_Controller {
 // CADENA, LISTA, NUMERO DE FILADEL DOCUMENTOEXCEL, NOMBRE DELCAMPO DELDOCUMENTO EXCEL
     function get_coincidencias($string, $list, $num_archivo, $subject = '',$coincidencia_mitad =0,$val_return = '-1') {
 //        print_r($list);
+        $string = trim($string);
         $encontrado = false;
     //  id para sacar el registro decoincidencias intermedias
         $id_reg =0;
-        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
+//        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
 //Si esta vacio retornamos -1
         if (empty($string)) {
             return '-1';
         }
         
-                echo tagcontent('script', 'console.log("'.$string.'");');
+//                echo tagcontent('script', 'console.log("'.$string.'");');
 //            print_r($string);
         foreach ($list as $value) {
-            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
+//            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
 //                echo tagcontent('script', 'console.log("'.$value->nombre.'");');
             
             // estas comparacion s ela hará solo para la datos que las coincidencias no estan ni al inicio ni al fin ni tienen la misma longitud
@@ -332,7 +333,7 @@ class Pacientes extends MX_Controller {
             // OJO para unidad va -2
             echo error_info_msg('El string "' . $string . '" de ' . $subject . ' no se encuentra registrado en el sistema, o el nombre no coincide');
 
-            $this->db->trans_rollback();
+//            $this->db->trans_rollback();
 //            die();
             /* FUNCION PARA GUARDAR INCIDENTES QUE NO SE PUDIERON GRABAR */
             $this->save_incidentes($string,$num_archivo,$subject, $this->archivo_name);
