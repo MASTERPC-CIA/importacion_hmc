@@ -60,6 +60,8 @@ class Pacientes extends MX_Controller {
 //        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
 //        $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
 //        $id_estado = $this->ver_estado_militar($string);
+        echo $this->verificar_fecha($string);
+        die();
         $id_grado= $this->get_grado_id_unidad_id($string,$this->grado_list,"SGOP","CBOS"
                 ,null,null,null,1,0);
         $id_unidad= $this->get_grado_id_unidad_id($string,null,null,null
@@ -628,6 +630,20 @@ class Pacientes extends MX_Controller {
             default:
                 break;
         }
+    }
+    
+    // verifico si la fecha esta en un formato dia-sep-12 si esta cuakquier otro valor remplazo x null o empty (aun x definir )
+    function verificar_fecha($string) {
+        $array_fecha = explode('-',$string);
+        
+        if(sizeof($array_fecha)>1){
+            $fecha = date_format(date_create($string), 'Y-m-d');
+            return $fecha;
+        }else{
+            return $fecha='';
+        }
+        
+//        echo $fecha_nac;
     }
 
 }
