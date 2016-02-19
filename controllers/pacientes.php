@@ -56,8 +56,8 @@ class Pacientes extends MX_Controller {
 //        $date= date_format(date_create($string), 'Y-m-d');
 //        echo $date;
 //        die();
-        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
-//        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
+//        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
+        $this->get_coincidencias($string, $this->sexo_list, 'sexo');
 //        $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
 //        $id_estado = $this->ver_estado_militar($string);
         die();
@@ -188,6 +188,7 @@ class Pacientes extends MX_Controller {
                     'familiar_direccion'=>  $calle_fam,
                     'familiar_telefono'=>  $telef_fam,
                     'codigo_issfa'=>  $tarjeta,
+                    'ci_titular'=>  $ci_tit,
                     'aseguradora_id' => get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
                     // Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
@@ -198,6 +199,11 @@ class Pacientes extends MX_Controller {
                     'unidad_id'=> $this->get_grado_id_unidad_id($tarifa,null,null,null
                         ,$this->unidades_list,$siguni,$sigunit,0,$x),
                     'nacionalidad_id'=>  $this->get_nacionalidadId($nacionalid, $this->nacionalidades_list, 'Nacionalidad'),
+                    'sexo_id'=>  $this->get_sexoId($sexo, $this->sexo_list, 'Sexo del paciente'),
+                    'estado_civil_id'=> $this->get_estadoCivilId($estado_civ, $this->estado_civil_list, 'Estado Civil'),
+                    'provincia_id'=>  $this->get_coincidencias($prov_pac, $this->provincias_list, $x,"Provincia"),
+                    'canton_id'=>  $this->get_coincidencias($cant_pac, $this->provincias_list, $x,"Canton"),
+                    'parroquia_id'=>  $this->get_coincidencias($ciud_pac, $this->provincias_list, $x,"Parroquia"),
                     
                 );
                 print_r($data);
