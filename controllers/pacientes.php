@@ -59,8 +59,13 @@ class Pacientes extends MX_Controller {
 //        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
 //        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
 //        $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
-        $id_estado = $this->ver_estado_militar($string);
-//        echo "id_estado ".$id_estado;
+//        $id_estado = $this->ver_estado_militar($string);
+        $id_grado= $this->get_grado_id_unidad_id($string,$this->grado_list,"SGOP","CBOS"
+                ,null,null,null,1,0);
+        $id_unidad= $this->get_grado_id_unidad_id($string,null,null,null
+                ,$this->unidades_list,"HT-III","HG III-DE",0,0);
+        echo "id_grado ".$id_grado;
+        echo "<br>id_unidad ".$id_unidad;
     }
 
     function importar1() {
@@ -122,7 +127,6 @@ class Pacientes extends MX_Controller {
             $PHPExcel = $Reader->load('./uploads/pacientes/' . $xls_data['file_name']);
             // Asignar hoja de excel activa
             $PHPExcel->setActiveSheetIndex(0);
-            $bancos_list['data'] = $this->generic_model->get('billing_banco', array('id >' => '0'), 'id, nombre banco');
             $grado_list['grado_list'] = $this->generic_model->get('cliente_grado',null, 'id, nombre grado');
 //            print_r($grado_list);
 
@@ -192,6 +196,7 @@ class Pacientes extends MX_Controller {
                     'familiar_telefono'=>  $telef_fam,
                     'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
+                    'grado_id'=> $this->get_grado_id($tarifa,$this->grado_list,$nomgra,$nomgrat,$x/*numero de fila del archivo excel*/),
                     
                 );
                 print_r($data);
@@ -267,7 +272,7 @@ class Pacientes extends MX_Controller {
             return false;
         }
     }
-
+// CADENA, LISTA, NUMERO DE FILADEL DOCUMENTOEXCEL, NOMBRE DELCAMPO DELDOCUMENTO EXCEL
     function get_coincidencias($string, $list, $num_archivo, $subject = '') {
 //        print_r($list);
         $encontrado = false;
@@ -278,14 +283,15 @@ class Pacientes extends MX_Controller {
             return '-1';
         }
         
+                echo tagcontent('script', 'console.log("'.$string.'");');
         foreach ($list as $value) {
             echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
+//                echo tagcontent('script', 'console.log("'.$value->nombre.'");');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
                 $encontrado = true;
                 break;
             }
         }
-
         if ($encontrado) {
             return $value->id;
         } else {
@@ -401,6 +407,177 @@ class Pacientes extends MX_Controller {
             }
         }else{
             return '-1';
+        }
+    }
+    
+    // saco  el grado delpaciente si es militar saco del campo excel nomgra y si es familiar saco del nomgrat
+    // Tambien de esta funcion saco la unidad si es militar saco del campo excel siguni y si es familiar saco del campo sigunit
+    // para estos se salen mas de una cooncidencia se tomará la ultima y en caso de nada se envia -2
+    function get_grado_id_unidad_id($tarifa,$grado_list=null,$nomgra=null,$nomgrat=null
+            ,$unidad_list=null,$siguni=null,$sigunit=null,$es_grado=0/*si esta en sero significa q es unidad*/,$num_arch_excel=0){
+        switch ($tarifa) {
+            // MILITARES
+            case 1:
+                if($es_grado == 1){
+                    // saca el grado
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    return $id_grado;
+                }else{
+                    // saca la unidad
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    return $id_unidad;
+                }
+
+                break;
+            case 2:
+                if($es_grado == 1){
+                    // saca el grado
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    return $id_grado;
+                }else{
+                    // saca la unidad
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    return $id_unidad;
+                }
+
+                break;
+            case 10:
+                if($es_grado == 1){
+                    // saca el grado
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    return $id_grado;
+                }else{
+                    // saca la unidad
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    return $id_unidad;
+                }
+
+                break;
+            case 11:
+                if($es_grado == 1){
+                    // saca el grado
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    return $id_grado;
+                }else{
+                    // saca la unidad
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    return $id_unidad;
+                }
+
+                break;
+            case 12:
+                if($es_grado == 1){
+                    // saca el grado
+                    $id_grado = $this->get_coincidencias($nomgra, $grado_list, $num_arch_excel, 'campo nomgra');
+                    return $id_grado;
+                }else{
+                    // saca la unidad
+                    $id_unidad = $this->get_coincidencias($siguni, $unidad_list, $num_arch_excel, 'campo siguni');
+                    return $id_unidad;
+                }
+
+                break;
+            
+            // FAMILIARES DE MILITAR
+            case 3:
+                if($es_grado == 1){
+                    // saco elgrado del familair
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    return $id_grado;
+                }else{
+                    // saco la unidad del familiar
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    return $id_unidad;
+                }
+
+                break;
+            case 4:
+                if($es_grado == 1){
+                    // saco elgrado del familair
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    return $id_grado;
+                }else{
+                    // saco la unidad del familiar
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    return $id_unidad;
+                }
+
+                break;
+            case 5:
+                if($es_grado == 1){
+                    // saco elgrado del familair
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    return $id_grado;
+                }else{
+                    // saco la unidad del familiar
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    return $id_unidad;
+                }
+
+                break;
+            case 6:
+                if($es_grado == 1){
+                    // saco elgrado del familair
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    return $id_grado;
+                }else{
+                    // saco la unidad del familiar
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    return $id_unidad;
+                }
+
+                break;
+            case 7:
+                if($es_grado == 1){
+                    // saco elgrado del familair
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    return $id_grado;
+                }else{
+                    // saco la unidad del familiar
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    return $id_unidad;
+                }
+
+                break;
+            case 8:
+                if($es_grado == 1){
+                    // saco elgrado del familair
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    return $id_grado;
+                }else{
+                    // saco la unidad del familiar
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    return $id_unidad;
+                }
+
+                break;
+            case 9:
+                if($es_grado == 1){
+                    // saco elgrado del familair
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    return $id_grado;
+                }else{
+                    // saco la unidad del familiar
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    return $id_unidad;
+                }
+
+                break;
+            case 13:
+                if($es_grado == 1){
+                    // saco elgrado del familair
+                    $id_grado = $this->get_coincidencias($nomgrat, $grado_list, $num_arch_excel, 'campo nomgrat');
+                    return $id_grado;
+                }else{
+                    // saco la unidad del familiar
+                    $id_unidad = $this->get_coincidencias($sigunit, $unidad_list, $num_arch_excel, 'campo sigunit');
+                    return $id_unidad;
+                }
+
+                break;
+
+            default:
+                break;
         }
     }
 }
