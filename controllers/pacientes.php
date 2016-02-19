@@ -69,61 +69,54 @@ class Pacientes extends MX_Controller {
         $this->loadfromfile($upload_path);
     }
 
-
-    public function loadfromfile($upload_path){
-         set_time_limit(0);
+    public function loadfromfile($upload_path) {
+        set_time_limit(0);
         $this->load->library('excel');
         $this->load->library('docident');
         $this->load->library('common/cuentasxpagar');
         $this->load->helper('date_helper');
-            
-        $config['upload_path'] = './uploads/'.$upload_path;
+
+        $config['upload_path'] = './uploads/' . $upload_path;
         $config['allowed_types'] = 'xlsx';
-        $config['max_size']	= '0';
-        $config['max_width']  = '0';
-        $config['max_height']  = '0';
+        $config['max_size'] = '0';
+        $config['max_width'] = '0';
+        $config['max_height'] = '0';
 
         $this->load->library('upload', $config);
 
-        if ( ! $this->upload->do_upload())
-        {
+        if (!$this->upload->do_upload()) {
             $error = $this->upload->display_errors();
-            echo tagcontent('strong', $error, array('class'=>'text-danger font20'));
-            die();    
-        }
-        else
-        {
+            echo tagcontent('strong', $error, array('class' => 'text-danger font20'));
+            die();
+        } else {
             $upl_data = $this->upload->data();
         }
 
         $upl_data = $this->upload->data();
-        
-        $this->get_pacientesdata_xls($upl_data,$upload_path);
-         
-            /* **Finalizamos la transaccion** */
-            if ($this->db->trans_status() === FALSE)
-            {
-                echo warning_msg(' Ha ocurrido un problema, no se pudo completar la transaccion.');                
-                $this->db->trans_rollback();
-            }
-            else
-            {
-                echo success_msg(' EL PROCESO A TERMINADO CON EXITO');
-                $this->db->trans_commit();
-            }
-                
-                echo tagcontent('strong', 'Se ha terminado de cargar el listado de clientes', array('class'=>'text-success font20'));
-            
+
+        $this->get_pacientesdata_xls($upl_data, $upload_path);
+
+        /*         * *Finalizamos la transaccion** */
+        if ($this->db->trans_status() === FALSE) {
+            echo warning_msg(' Ha ocurrido un problema, no se pudo completar la transaccion.');
+            $this->db->trans_rollback();
+        } else {
+            echo success_msg(' EL PROCESO A TERMINADO CON EXITO');
+            $this->db->trans_commit();
+        }
+
+        echo tagcontent('strong', 'Se ha terminado de cargar el listado de clientes', array('class' => 'text-success font20'));
     }
-    function get_pacientesdata_xls($xls_data,$upload_path) {
-        if (file_exists('./uploads/'.$upload_path."/" . $xls_data['file_name'])) {
+
+    function get_pacientesdata_xls($xls_data, $upload_path) {
+        if (file_exists('./uploads/' . $upload_path . "/" . $xls_data['file_name'])) {
             // Cargando la hoja de c�lculo
             $Reader = new PHPExcel_Reader_Excel2007();
             $PHPExcel = $Reader->load('./uploads/pacientes/' . $xls_data['file_name']);
             // Asignar hoja de excel activa
             $PHPExcel->setActiveSheetIndex(0);
             $bancos_list['data'] = $this->generic_model->get('billing_banco', array('id >' => '0'), 'id, nombre banco');
-            $grado_list['grado_list'] = $this->generic_model->get('cliente_grado',null, 'id, nombre grado');
+            $grado_list['grado_list'] = $this->generic_model->get('cliente_grado', null, 'id, nombre grado');
 //            print_r($grado_list);
 
 
@@ -133,10 +126,10 @@ class Pacientes extends MX_Controller {
                 $cedula = get_value_xls($PHPExcel, 1, $x); // PersonaComercio_cedulaRuc
                 $tarjeta = get_value_xls($PHPExcel, 2, $x); // codigo_issfa
                 $tarifa = get_value_xls($PHPExcel, 3, $x); // clientetipo_idclientetipo
-                
+
                 $apellido = get_value_xls($PHPExcel, 5, $x); // apellido
                 $nombre = get_value_xls($PHPExcel, 6, $x); // nombre
-                
+
                 $convenio = get_value_xls($PHPExcel, 8, $x); // aseguradoras_id
                 $fecha_nac = get_fecha_xls($PHPExcel, 9, $x); //fecha nacimiento
                 $sexo = get_value_xls($PHPExcel, 10, $x); // sexo_id
@@ -150,17 +143,17 @@ class Pacientes extends MX_Controller {
                 $telef_pac = get_value_xls($PHPExcel, 18, $x); // telefonos
                 $nomb_fam = get_value_xls($PHPExcel, 19, $x); // familiar_nombre
                 $rela_fam = get_value_xls($PHPExcel, 20, $x); // familiar_parentesco
-                
+
                 $calle_fam = get_value_xls($PHPExcel, 24, $x); // familiar_direccion
                 $telef_fam = get_value_xls($PHPExcel, 25, $x); // familiar_telefono
                 $ci_tit = get_value_xls($PHPExcel, 26, $x); // ci_titular
-                
+
                 $siguni = get_value_xls($PHPExcel, 37, $x); // unidad_id => en caso de que el paciente sea militar
                 $sigunit = get_value_xls($PHPExcel, 38, $x); // unidad_id => encaso de que elpaciente sea familairde militar
-                
+
                 $nomgra = get_value_xls($PHPExcel, 40, $x); // grado_id  => en caso de que el paciente sea  militar
                 $nomgrat = get_value_xls($PHPExcel, 41, $x); // grado_id  => en caso de que el paciente sea familiar de militar
-                
+
                 $petnica = get_value_xls($PHPExcel, 44, $x); // etnia_id 
                 $nacionalid = get_value_xls($PHPExcel, 45, $x); // nacionalidad_id 
                 $afiess = get_value_xls($PHPExcel, 46, $x); // aseguradora_id => en caso de que convenio este vacio o el dato de convenio no sea un id valido con la tabla 
@@ -168,33 +161,31 @@ class Pacientes extends MX_Controller {
                 $afispol = get_value_xls($PHPExcel, 48, $x); // aseguradora_id => en caso de que convenio este vacio o el dato de convenio no sea un id valido con la tabla 
                 $afotros = get_value_xls($PHPExcel, 49, $x); // aseguradora_id => en caso de que convenio este vacio o el dato de convenio no sea un id valido con la tabla 
                 $correo = get_value_xls($PHPExcel, 50, $x); // email
-                
-               // Valores a guardar en la tabla billiong_cliente
+                // Valores a guardar en la tabla billiong_cliente
 //                echo $fecha_nac." longitud ".strlen($fecha_nac);
-                if(strlen(trim($fecha_nac)) <11){
-                    $fecha_nac='';
+                if (strlen(trim($fecha_nac)) < 11) {
+                    $fecha_nac = '';
                 }
                 $data = array(
-                    'PersonaComercio_cedulaRuc'=>$cedula,
-                    'nombres'=>$nombre,
-                    'apellidos'=>$apellido,
-                    'direccion'=>$calle_pac,
-                    'telefonos'=>$telef_pac,
-                    'fecha'=>$fecha_aper,
-                    'num_archivo'=>$numero,
-                    'user_id'=>  $this->user->id,
-                    'fecha_nacimiento'=>date_format(date_create($fecha_nac), 'Y-m-d'),
-                    'ocupacion'=>  $ocupacion,
-                    'familiar_nombre'=>  $nomb_fam,
-                    'familiar_parentesco'=>  $rela_fam,
-                    'familiar_direccion'=>  $calle_fam,
-                    'familiar_telefono'=>  $telef_fam,
-                    'familiar_telefono'=>  $telef_fam,
-                    'aseguradora_id'=>  get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
+                    'PersonaComercio_cedulaRuc' => $cedula,
+                    'nombres' => $nombre,
+                    'apellidos' => $apellido,
+                    'direccion' => $calle_pac,
+                    'telefonos' => $telef_pac,
+                    'fecha' => $fecha_aper,
+                    'num_archivo' => $numero,
+                    'user_id' => $this->user->id,
+                    'fecha_nacimiento' => date_format(date_create($fecha_nac), 'Y-m-d'),
+                    'ocupacion' => $ocupacion,
+                    'familiar_nombre' => $nomb_fam,
+                    'familiar_parentesco' => $rela_fam,
+                    'familiar_direccion' => $calle_fam,
+                    'familiar_telefono' => $telef_fam,
+                    'familiar_telefono' => $telef_fam,
+                    'aseguradora_id' => get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
 //                    'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
-                    'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
-                    // primero pasar que tarifa nos ea mayor a 8 
-                    
+                    'estado_id' => $this->ver_estado_militar($tarifa), // Crear funcion del 1 - 8 los pares pasivos y los impares son activos
+                        // primero pasar que tarifa nos ea mayor a 8 
                 );
                 print_r($data);
 //                if ($this->cheque_existe($nro, $banco_id)) {
@@ -224,6 +215,7 @@ class Pacientes extends MX_Controller {
 //            $this->db->trans_commit();
 //        }
     }
+
 // Funcion de busqueda de coincidencias por medio de un array 
     function get_idbanco($nombre_banco, $bancos_list) {
 //        print_r($bancos_list['data']);
@@ -231,9 +223,9 @@ class Pacientes extends MX_Controller {
         foreach ($bancos_list['data'] as $value) {
 //            echo '<br> ' . $value->id . ' ' . $value->banco;
 //            echo '<br>BAnco: ' . $nombre_banco;
-            echo '<br>'.strcmp($nombre_banco, $value->banco);
+            echo '<br>' . strcmp($nombre_banco, $value->banco);
 //            substr_compare ($cadena1 , $cadena2 , 0, strlen($cadena1), true);
-            if (strcmp(substr_compare ($nombre_banco , $value->banco , 0, strlen($nombre_banco), true)) == 0) {
+            if (strcmp(substr_compare($nombre_banco, $value->banco, 0, strlen($nombre_banco), true)) == 0) {
 //                echo '<br>Encontrado, ID: ' . $value->id;
                 return $value->id;
             } else {
@@ -274,12 +266,12 @@ class Pacientes extends MX_Controller {
 //        print_r($list);
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
-        
+
 //Si esta vacio retornamos -1
-        if(empty($string)){
+        if (empty($string)) {
             return '-1';
         }
-        
+
         foreach ($list as $value) {
             echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
@@ -308,10 +300,10 @@ class Pacientes extends MX_Controller {
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
-        if(empty($string)){
+        if (empty($string)) {
             return '-1';
         }
-        
+
         foreach ($list as $value) {
             echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
@@ -327,22 +319,22 @@ class Pacientes extends MX_Controller {
             return '-1';
         }
     }
-    
+
     function get_sexoId($string, $list, $subject = '') {
 //        print_r($list);
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
-        
+
         //Si esta vacio retornamos -1
-        if(empty($string)){
+        if (empty($string)) {
             return '-1';
         }
-        
+
         foreach ($list as $value) {
             echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
                 $encontrado = true;
-                
+
                 break;
             }
         }
@@ -354,21 +346,22 @@ class Pacientes extends MX_Controller {
             return '-1';
         }
     }
+
     function get_estadoCivilId($string, $list, $subject = '') {
 //        print_r($list);
         $encontrado = false;
         echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
-        
+
         //Si esta vacio retornamos -1
-        if(empty($string)){
+        if (empty($string)) {
             return '-1';
         }
-        
+
         foreach ($list as $value) {
             echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
                 $encontrado = true;
-                
+
                 break;
             }
         }
@@ -381,7 +374,8 @@ class Pacientes extends MX_Controller {
         }
     }
 
-    /*Guarda los strings que no se pudieron guardar por mala digitacion del usuario, para tener respaldo.  JLQ*/
+    /* Guarda los strings que no se pudieron guardar por mala digitacion del usuario, para tener respaldo.  JLQ */
+
     function save_incidentes($string, $subject, $num_archivo_paciente) {
         $data = array(
             'string' => $string,
@@ -390,43 +384,44 @@ class Pacientes extends MX_Controller {
         );
         $this->generic_model->save('incidentes_importacion', $data);
     }
-    
-    /*Extrae la aseguradora segun los campos del excel. JLQ*/
+
+    /* Extrae la aseguradora segun los campos del excel. JLQ */
+
     function get_aseguradoraId($convenio_id, $es_iess, $es_issfa, $es_isspol, $es_otros) {
         //Si el convenio coincide del 1 - 9, se graba directo el id
-        if($convenio_id >= 1 && $convenio_id <=9){
+        if ($convenio_id >= 1 && $convenio_id <= 9) {
             return $convenio_id;
         }
         //Si esta vacio buscamos en los campos restantes
-        else if(empty ($convenio_id)){
-            if($es_iess == 'VERDADERO'){
-                return '3';//Id 3: IESS, seguro voluntario
-            }
-            else if($es_issfa == 'VERDADERO'){
-                return '1';//Id 1: Seguro ISSFA
-            }
-            else if($es_isspol == 'VERDADERO'){
-                return '2';//Id 2: Seguro ISSPOL
-            }
-            else if($es_otros == 'VERDADERO'){
-                return '-1';//Id -1: Otros seguros
-            }
-            else {//Si no coincide ninguno enviamos -2: NINGUNA
+        else if (empty($convenio_id)) {
+            if ($es_iess == 'VERDADERO') {
+                return '3'; //Id 3: IESS, seguro voluntario
+            } else if ($es_issfa == 'VERDADERO') {
+                return '1'; //Id 1: Seguro ISSFA
+            } else if ($es_isspol == 'VERDADERO') {
+                return '2'; //Id 2: Seguro ISSPOL
+            } else if ($es_otros == 'VERDADERO') {
+                return '-1'; //Id -1: Otros seguros
+            } else {//Si no coincide ninguno enviamos -2: NINGUNA
                 return '-2';
             }
+        }
+    }
+
     //del 1 - 8 los pares pasivos y los impares son activos
-                    // primero pasar que tarifa nos ea mayor a 8 
+    // primero pasar que tarifa nos ea mayor a 8 
     function ver_estado_militar($id_tipocliente) {
-        if($id_tipocliente <= 8){
-            if($id_tipocliente %2==0){
+        if ($id_tipocliente <= 8) {
+            if ($id_tipocliente % 2 == 0) {
 //                echo "Pasivo";
                 return 2;
-            }else{
+            } else {
 //                echo "Activo";
                 return 1;
             }
-        }else{
+        } else {
             return '-1';
         }
     }
+
 }
