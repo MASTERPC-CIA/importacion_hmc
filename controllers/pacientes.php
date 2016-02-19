@@ -56,12 +56,12 @@ class Pacientes extends MX_Controller {
 //        $date= date_format(date_create($string), 'Y-m-d');
 //        echo $date;
 //        die();
-//        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
+        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
 //        $this->get_coincidencias($string, $this->parroquias_list, 'Parroquias');
 //        $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
 //        $id_estado = $this->ver_estado_militar($string);
-        echo $this->verificar_fecha($string);
         die();
+        echo $this->verificar_fecha($string);
         $id_grado= $this->get_grado_id_unidad_id($string,$this->grado_list,"SGOP","CBOS"
                 ,null,null,null,1,0);
         $id_unidad= $this->get_grado_id_unidad_id($string,null,null,null
@@ -178,7 +178,7 @@ class Pacientes extends MX_Controller {
                     'apellidos'=>$apellido,
                     'direccion'=>$calle_pac,
                     'telefonos'=>$telef_pac,
-                    'fecha'=>$fecha_aper,
+                    'fecha'=>$this->verificar_fecha($fecha_aper),
                     'num_archivo'=>$numero,
                     'user_id'=>  $this->user->id,
                     'fecha_nacimiento'=>  $this->verificar_fecha($fecha_nac),
@@ -187,16 +187,17 @@ class Pacientes extends MX_Controller {
                     'familiar_parentesco'=>  $rela_fam,
                     'familiar_direccion'=>  $calle_fam,
                     'familiar_telefono'=>  $telef_fam,
-                    'familiar_telefono'=>  $telef_fam,
+                    'codigo_issfa'=>  $tarjeta,
                     'aseguradora_id' => get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
-                    'estado_id'=> $this->ver_estado_militar($tarifa),// Crear funcion del 1 - 8 los pares pasivos y los impares son activos
+                    // Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
-                    
+                    'estado_id'=> $this->ver_estado_militar($tarifa),
                     // la funcion solo se le especifica si es grado o unidad
                     'grado_id'=> $this->get_grado_id_unidad_id($tarifa,$this->grado_list,$nomgra,$nomgrat
-                ,null,null,null,1,$x),
+                        ,null,null,null,1,$x),
                     'unidad_id'=> $this->get_grado_id_unidad_id($tarifa,null,null,null
-                ,$this->unidades_list,$siguni,$sigunit,0,$x),
+                        ,$this->unidades_list,$siguni,$sigunit,0,$x),
+                    'nacionalidad_id'=>  $this->get_nacionalidadId($nacionalid, $this->nacionalidades_list, 'Nacionalidad'),
                     
                 );
                 print_r($data);
