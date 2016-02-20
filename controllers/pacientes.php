@@ -21,6 +21,7 @@ class Pacientes extends MX_Controller {
     private $parroquias_list;
     private $sexo_list;
     private $estado_civil_list;
+    private $etnia_list;
     private $grado_list;
     private $unidades_list;
     private $tarifa_cliente_tipo_list;
@@ -38,6 +39,8 @@ class Pacientes extends MX_Controller {
         $this->sexo_list = $this->generic_model->get('cliente_sexo', array('id >' => '0'), 'id, SUBSTRING(nombre,1,1)nombre');
         //NOTA se requiere nueva funcion para extraer id estado civil
         $this->estado_civil_list = $this->generic_model->get('cliente_estado_civil', array('id >' => '0'), 'id, SUBSTRING(nombre,1,1)nombre');
+        // Listadod e las Etnias
+        $this->etnia_list = $this->generic_model->get('cliente_etnia', array('id >' => '0'), 'id, nombre');
         //NOTA se requiere nueva funcion para extraer grado_id para militar y para familiar
         $this->grado_list = $this->generic_model->get('cliente_grado', array('id >' => '0'), 'id, nombre');
         //NOTA se requiere nueva funcion para extraer id unidad para militar y para familiar
@@ -178,6 +181,13 @@ class Pacientes extends MX_Controller {
                 if (strlen(trim($fecha_nac)) < 11) {
                     $fecha_nac = '';
                 }
+                $nomgra = $this->campos_excel_vacios($nomgra,'nomgra');
+                $nomgrat = $this->campos_excel_vacios($nomgrat,'nomgraT');
+                
+                $siguni = $this->campos_excel_vacios($siguni,'$siguni');
+                $sigunit = $this->campos_excel_vacios($sigunit,'$siguniT');
+                // LOS CAMPOS QUE EN EL EXCEL ESTAN VACIOS LOS REMPLAZO X EL STRING CAMPO VACIO 
+                
                 $data = array(
                     'PersonaComercio_cedulaRuc'=>$cedula,
                     'nombres'=>$nombre,
@@ -196,6 +206,8 @@ class Pacientes extends MX_Controller {
                     'codigo_issfa'=>  $tarjeta,
                     'ci_titular'=>  $ci_tit,
                     'clientetipo_idclientetipo'=>  $tarifa,
+                    'email'=>  $correo,
+                    'etnia_id'=>  $this->validar_etnia($petnica,$this->etnia_list),
                     'aseguradora_id' => $this->get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros),
                     // Crear funcion del 1 - 8 los pares pasivos y los impares son activos
                     // primero pasar que tarifa nos ea mayor a 8 
@@ -220,13 +232,13 @@ class Pacientes extends MX_Controller {
 //                    break;
 //                }
 //                //Guardar values en la BD
-//                $save_cheque = $this->generic_model->save($values_cheque, 'bill_cheque_pago');
-////                echo $save_cheque;
-//                if ($save_cheque <= 0) {
-//                    echo warning_msg('Ha ocurrido un problema al grabar');
-//                    $this->db->trans_rollback();
-//                    die();
-//                }
+                $save_cheque = $this->generic_model->save($data, 'billing_cliente_copy1');
+//                echo $save_cheque;
+                if ($save_cheque <= 0) {
+                    echo warning_msg('Ha ocurrido un problema al grabar');
+                    $this->db->trans_rollback();
+                    die();
+                }
             }
         } else {
             echo error_info_msg('No se ha podido cargar el archivo .xlsx');
@@ -689,6 +701,30 @@ class Pacientes extends MX_Controller {
         }
         
 //        echo $fecha_nac;
+    }
+    
+    // Validamos la etnia si es un dato de labase de datos 
+    function validar_etnia($petnica,$lista_etnia){
+        $petnica = trim($petnica);
+        
+        foreach ($lista_etnia as $key => $value) {
+            if($value->id == $petnica){
+                return $value->id;
+            }else{
+                return '-1';
+            }
+            
+        }
+        
+    }
+    
+    function campos_excel_vacios($string,$nombre_campo) {
+        if(empty($string)){
+            $string = 'CAMPO'.$nombre_campo.' EXCEL VACIO';
+        }else{
+            $string = $string;
+        }
+        return $string;
     }
 
 }
