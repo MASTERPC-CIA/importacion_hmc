@@ -59,15 +59,15 @@ class Pacientes extends MX_Controller {
 //        echo $date;
 //        die();
 //        $this->get_nacionalidadId($string, $this->nacionalidades_list, 'Nacionalidad');
-        $this->get_coincidencias($string, $this->sexo_list, 'sexo');
+//        $this->get_coincidencias($string, $this->sexo_list, 'sexo');
 //        $this->get_estadoCivilId($string, $this->estado_civil_list, 'Extado Civil');
 //        $id_estado = $this->ver_estado_militar($string);
-        die();
-        echo $this->verificar_fecha($string);
-        $id_grado= $this->get_grado_id_unidad_id($string,$this->grado_list,"SGOP","CBOS"
+//        die();
+//        echo $this->verificar_fecha($string);
+        $id_grado= $this->get_grado_id_unidad_id($string,$this->grado_list,"SUBTE","CBOS"
                 ,null,null,null,1,0);
         $id_unidad= $this->get_grado_id_unidad_id($string,null,null,null
-                ,$this->unidades_list,"HT-III","III-DE",0,0);
+                ,$this->unidades_list,"BI-8","III-DE",0,0);
         echo "id_grado ".$id_grado;
         echo "<br>id_unidad ".$id_unidad;
     }
@@ -303,17 +303,18 @@ class Pacientes extends MX_Controller {
         
 //                echo tagcontent('script', 'console.log("'.$string.'");');
 //            print_r($string);
+                $aux = 0;
+                $id_reg =0;
         foreach ($list as $value) {
 //            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
 //                echo tagcontent('script', 'console.log("'.$value->nombre.'");');
             
             // estas comparacion s ela hará solo para la datos que las coincidencias no estan ni al inicio ni al fin ni tienen la misma longitud
             if($coincidencia_mitad == 1){
-                $array_concidencias_string = explode($string, $value->nombre);// en casode que hayan espacios se va por url con %20 y por mediod e eso losdivide 
+                $array_concidencias_string = explode($string, $value->nombre);
 
-                $aux = 0;
-                $id_reg =0;
                 if(sizeof($array_concidencias_string)>1){
+//                    echo "<br>CAdena de la lista ".$value->nombre."  Id:  ".$value->id;
                     $aux = $value->id;
                     if($aux > $id_reg){
                         $id_reg = $aux;
