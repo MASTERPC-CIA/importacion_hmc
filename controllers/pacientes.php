@@ -838,6 +838,8 @@ class Pacientes extends MX_Controller {
             $segundo_nombre = $array_nombre[1];
         } else if (sizeof($array_nombre) == 3) {//si tiene 3 nombres (ej. Andres del cisne)
             $segundo_nombre = $array_nombre[1] . ' ' . $array_nombre[2];
+        }else{
+            $segundo_nombre = $array_nombre[1];
         }
         return $segundo_nombre;
     }
