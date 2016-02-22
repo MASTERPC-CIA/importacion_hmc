@@ -775,7 +775,7 @@ class Pacientes extends MX_Controller {
         if ($nacionalidad != 1) {
             $codigo_provincia = '99';
         } else {
-            $codigo_provincia = $this->ci->generic_model->get_val('bill_provincia', $provincia_id, 'codigoProv', 'idProvincia');
+            $codigo_provincia = $this->generic_model->get_val('bill_provincia', $provincia_id, 'codigoProv', 'idProvincia');
         }
 
         /* Anio de nacimiento 4 caracteres */
