@@ -29,8 +29,13 @@ class Pacientes extends MX_Controller {
     private $row_file;
     private $es_pasaporte;
     private $PersonaComercio_cedulaRuc;
-
-    function __construct() {
+    // Creo las variables para ocupar la funcion de nuhc
+    private $nombre;
+    private $apellido;
+    private $provincia_id;
+    private $nacionalidad_id;
+    private $fecha_nac;
+                function __construct() {
         parent::__construct();
         $this->load->library('docident'); // validacion de cedulas ruc etc
         
@@ -189,6 +194,13 @@ class Pacientes extends MX_Controller {
                 $nomgra = $this->campos_excel_vacios($nomgra,'nomgra');
                 $nomgrat = $this->campos_excel_vacios($nomgrat,'nomgraT');
                 
+                //  A los valores que voya a envair comoaprametros que deben cambiar cada vez aqui leasigno el valor 
+                $this->nacionalidad_id = $this->get_nacionalidadId($nacionalid, $this->nacionalidades_list, 'Nacionalidad');
+                $this->provincia_id = $this->get_coincidencias($prov_pac, $this->provincias_list, $x,"Provincia");
+                $this->nombre = $nombre;
+                $this->apellido = $apellido;
+                $this->fecha_nac = $this->verificar_fecha($fecha_nac);
+                
                 $siguni = $this->campos_excel_vacios($siguni,'$siguni');
                 $sigunit = $this->campos_excel_vacios($sigunit,'$siguniT');
                 
@@ -204,7 +216,8 @@ class Pacientes extends MX_Controller {
                     'fecha'=>$this->verificar_fecha($fecha_aper),
                     'num_archivo'=>$numero,
                     'user_id'=>  $this->user->id,
-                    'fecha_nacimiento'=>  $this->verificar_fecha($fecha_nac),
+//                    'fecha_nacimiento'=>  $this->verificar_fecha($fecha_nac),
+                    'fecha_nacimiento'=>  $this->fecha_nac,
                     'ocupacion'=>  $ocupacion,
                     'familiar_nombre'=>  $nomb_fam,
                     'familiar_parentesco'=>  $rela_fam,
@@ -224,10 +237,12 @@ class Pacientes extends MX_Controller {
                         ,null,null,null,1,$x),
                     'unidad_id'=> $this->get_grado_id_unidad_id($tarifa,null,null,null
                         ,$this->unidades_list,$siguni,$sigunit,0,$x),
-                    'nacionalidad_id'=>  $this->get_nacionalidadId($nacionalid, $this->nacionalidades_list, 'Nacionalidad'),
+//                    'nacionalidad_id'=>  $this->get_nacionalidadId($nacionalid, $this->nacionalidades_list, 'Nacionalidad'),
+                    'nacionalidad_id'=>  $this->nacionalidad_id,
                     'sexo_id'=>  $this->get_sexoId($sexo, $this->sexo_list, 'Sexo del paciente'),
                     'estado_civil_id'=> $this->get_estadoCivilId($estado_civ, $this->estado_civil_list, 'Estado Civil'),
-                    'provincia_id'=>  $this->get_coincidencias($prov_pac, $this->provincias_list, $x,"Provincia"),
+//                    'provincia_id'=>  $this->get_coincidencias($prov_pac, $this->provincias_list, $x,"Provincia"),
+                    'provincia_id'=>  $this->provincia_id,
                     'canton_id'=>  $this->get_coincidencias($cant_pac, $this->cantones_list, $x,"Canton"),
                     'parroquia_id'=>  $this->get_coincidencias($ciud_pac, $this->parroquias_list, $x,"Parroquia"),
                     
@@ -836,7 +851,9 @@ class Pacientes extends MX_Controller {
                     // VALIDO SI TIENE DATOS SI TIENE DATOS ES PASAPORTE
                     if(empty($clienteID)){
                         // Lalamo a funciond e generar codigo nuhc
-                        $this->get_nuhc();// joshe crea las variables globales que necesite para esta funcion 
+                        $this->es_pasaporte = 1;
+                        $clienteID = $this->get_nuhc($this->nombre,  $this->apellido,$this->provincia_id,  $this->nacionalidad_id,$this->fecha_nac);//se envia las variables globales que necesite para esta funcion 
+                        return $clienteID;
                     }else{
                         $this->es_pasaporte = 1;
                         return $clienteID;
