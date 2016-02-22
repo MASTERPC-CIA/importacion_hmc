@@ -77,6 +77,23 @@ class Pacientes extends MX_Controller {
 //        $id_estado = $this->ver_estado_militar($string);
 //        die();
 //        echo $this->verificar_fecha($string);
+        
+//        $string = (int) $string;
+//        $string = strrpos($string,'0');
+        $cont = $this->contar_n_caracteres($string,0);
+        
+//            echo "Este cedula tiene ".$cont." ceros";
+        if($cont == strlen($string)){
+            echo "Este cedula tiene ".$cont." ceros";
+        }
+        $valido = $this->validar_caracteres_permitidos($string);
+        if($valido){
+            echo "<br>String valido => ".$valido;
+        }else{
+            echo "<br>String no valido => ".$valido;
+            
+        }
+        die();
         echo $this->get_nuhc('Juan Ramon', 'Pérez Andrade', '-1', '1', '');
         die();
         $id_grado = $this->get_grado_id_unidad_id($string, $this->grado_list, "SUBTE", "CBOS"
@@ -853,6 +870,16 @@ class Pacientes extends MX_Controller {
                     $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
                     return $clienteID;
                 } else {
+                    // validar que no tenga solo ceros 
+                    $cont = $this->contar_n_caracteres($clienteID,0);
+                    if($cont == strlen($clienteID)){
+                        $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
+                    }else{
+                        $caracteres_nopermitidos = $this->validar_caracteres_permitidos($clienteID);
+                        if($caracteres_nopermitidos == false){
+                            $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
+                        }
+                    }
                     $this->es_pasaporte = 1;
                     return $clienteID;
                 }
@@ -865,6 +892,31 @@ class Pacientes extends MX_Controller {
             $this->es_pasaporte = 0;
             return $clienteID;
         }
+    }
+    
+    function contar_n_caracteres($string,$caracter) {
+//        echo $string."<br>";
+        $cont = 0;
+        foreach (count_chars($string, 1) as $key => $value) {
+//            echo "<br>se encontro ".$value." veces de el caracter ". chr($key);
+            if(chr($key) == $caracter){
+                $cont = $value;
+            }
+        }
+//        echo "<br>Cont ".$cont;
+//        echo "<br>Longitud ".  strlen($string);
+        
+        return $cont;
+    }
+    
+    function validar_caracteres_permitidos($string){
+        if (preg_match("/^[a-zA-Z0-9\-_]{1,}$/", $string)) { 
+//          echo "El nombre de usuario $nombre_usuario es correcto<br>"; 
+          return true; 
+       } else { 
+//           echo "El nombre de usuario $nombre_usuario no es válido<br>"; 
+          return false; 
+       }
     }
 
 }
