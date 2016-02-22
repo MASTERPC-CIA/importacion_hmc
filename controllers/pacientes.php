@@ -27,9 +27,13 @@ class Pacientes extends MX_Controller {
     private $tarifa_cliente_tipo_list;
     private $archivo_name;
     private $row_file;
+    private $es_pasaporte;
+    private $PersonaComercio_cedulaRuc;
 
     function __construct() {
         parent::__construct();
+        $this->load->library('docident'); // validacion de cedulas ruc etc
+        
         //NOTA  Nacionalidades tiene un formato de registro diferente en el excel
         $this->nacionalidades_list = $this->generic_model->get('nacionalidad', array('id >' => '0', 'id <' => '5'), 'id, SUBSTRING(nombre,1,3)nombre');
         $this->provincias_list = $this->generic_model->get('bill_provincia', array('idProvincia >' => '0'), 'idProvincia id, descripProv nombre');
@@ -181,15 +185,18 @@ class Pacientes extends MX_Controller {
                 if (strlen(trim($fecha_nac)) < 11) {
                     $fecha_nac = '';
                 }
+                // LOS CAMPOS QUE EN EL EXCEL ESTAN VACIOS LOS REMPLAZO X EL STRING CAMPO VACIO 
                 $nomgra = $this->campos_excel_vacios($nomgra,'nomgra');
                 $nomgrat = $this->campos_excel_vacios($nomgrat,'nomgraT');
                 
                 $siguni = $this->campos_excel_vacios($siguni,'$siguni');
                 $sigunit = $this->campos_excel_vacios($sigunit,'$siguniT');
-                // LOS CAMPOS QUE EN EL EXCEL ESTAN VACIOS LOS REMPLAZO X EL STRING CAMPO VACIO 
                 
+                // Valido la cedula y asigno cedula ruc o pasaporte a la variable global para bque guarde en clientes
+                $this->PersonaComercio_cedulaRuc = $this->validar_cedula_ruc($cedula);
                 $data = array(
-                    'PersonaComercio_cedulaRuc'=>$cedula,
+                    'PersonaComercio_cedulaRuc'=>$this->PersonaComercio_cedulaRuc,
+                    'es_pasaporte'=>  $this->es_pasaporte,
                     'nombres'=>$nombre,
                     'apellidos'=>$apellido,
                     'direccion'=>$calle_pac,
@@ -816,4 +823,32 @@ class Pacientes extends MX_Controller {
     }
 
 
+    // Validar cedula o ruc 
+    function validar_cedula_ruc($clienteID) {
+        $cedRuc_valida = $this->docident->validarCedula($clienteID);
+            if ($cedRuc_valida == false) {
+                // valido q si no fue correcta la cedula valide por ruc 
+                $cedRuc_valida = $this->docident->validarRucPersonaNatural($clienteID);
+                if ($cedRuc_valida == false) {
+//                    echo tagcontent('script', 'alertaError(" Cédula o Ruc Invalida")');
+//                    die();
+                    
+                    // VALIDO SI TIENE DATOS SI TIENE DATOS ES PASAPORTE
+                    if(empty($clienteID)){
+                        // Lalamo a funciond e generar codigo nuhc
+                        $this->get_nuhc();// joshe crea las variables globales que necesite para esta funcion 
+                    }else{
+                        $this->es_pasaporte = 1;
+                        return $clienteID;
+                    }
+                }else{
+                    $this->es_pasaporte = 0;
+                    return $clienteID;
+                }
+            }else{
+                // Es cedula
+                $this->es_pasaporte = 0;
+                return $clienteID;
+            }
+    }
 }
