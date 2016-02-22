@@ -776,11 +776,14 @@ class Pacientes extends MX_Controller {
         //Si es extranjero se pone 99
         if ($nacionalidad != 1) {
             $codigo_provincia = '99';
-        } else {
+        } else if($nacionalidad != '-1') {
 //            print_r($this->provincias_list);
 //            echo '<br>Provincia id: '.$this->provincia_id;
 //            echo '<br>Codigo: ';
             $codigo_provincia = $this->provincias_list[$provincia_id]->codigo;
+        }else{
+            $codigo_provincia = $this->provincias_list[$provincia_id]->codigo;
+            
         }
 
         if (empty($fecha_nac)) {
