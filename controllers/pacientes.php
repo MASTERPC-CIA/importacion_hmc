@@ -201,8 +201,8 @@ class Pacientes extends MX_Controller {
                 $this->apellido = $apellido;
                 $this->fecha_nac = $this->verificar_fecha($fecha_nac);
                 
-                $siguni = $this->campos_excel_vacios($siguni,'$siguni');
-                $sigunit = $this->campos_excel_vacios($sigunit,'$siguniT');
+                $siguni = $this->campos_excel_vacios($siguni,'siguni');
+                $sigunit = $this->campos_excel_vacios($sigunit,'sigunit');
                 
                 // Valido la cedula y asigno cedula ruc o pasaporte a la variable global para bque guarde en clientes
                 $this->PersonaComercio_cedulaRuc = $this->validar_cedula_ruc($cedula);
@@ -719,7 +719,7 @@ class Pacientes extends MX_Controller {
             $fecha = date_format(date_create($string), 'Y-m-d');
             return $fecha;
         }else{
-            return $fecha='';
+            return $fecha='00-00-0000';
         }
         
 //        echo $fecha_nac;
@@ -742,7 +742,7 @@ class Pacientes extends MX_Controller {
     
     function campos_excel_vacios($string,$nombre_campo) {
         if(empty($string)){
-            $string = 'CAMPO'.$nombre_campo.' EXCEL VACIO';
+            $string = 'CAMPO '.$nombre_campo.' EXCEL VACIO';
         }else{
             $string = $string;
         }
