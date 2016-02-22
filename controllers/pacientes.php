@@ -370,7 +370,7 @@ class Pacientes extends MX_Controller {
         } else {
 
             // OJO para unidad va -2
-            echo error_info_msg('El string "' . $string . '" de ' . $subject . ' no se encuentra registrado en el sistema, o el nombre no coincide');
+//            echo error_info_msg('El string "' . $string . '" de ' . $subject . ' no se encuentra registrado en el sistema, o el nombre no coincide');
 
 //            $this->db->trans_rollback();
 //            die();
@@ -413,7 +413,7 @@ class Pacientes extends MX_Controller {
 //        print_r($list);
         $string = trim($string);
         $encontrado = false;
-        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
+//        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
         //Si esta vacio retornamos -1
         if (empty($string)) {
@@ -441,7 +441,7 @@ class Pacientes extends MX_Controller {
 //        print_r($list);
         $string = trim($string);
         $encontrado = false;
-        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
+//        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
         //Si esta vacio retornamos -1
         if (empty($string)) {
@@ -449,7 +449,7 @@ class Pacientes extends MX_Controller {
         }
 
         foreach ($list as $value) {
-            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
+//            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
                 $encontrado = true;
 
@@ -802,9 +802,9 @@ class Pacientes extends MX_Controller {
             /* Dia de nacimiento 4 caracteres */
             $dia_nac = date('d', strtotime($fecha_nac));
         }
-        echo $fecha_nac;
-        echo date('Y-m-d', strtotime($fecha_nac));
-        echo '<br>';
+//        echo $fecha_nac;
+//        echo date('Y-m-d', strtotime($fecha_nac));
+//        echo '<br>';
         /* Decada de nacimiento */
         $control = substr($anio_nac, 2, 1);
 
@@ -904,6 +904,7 @@ class Pacientes extends MX_Controller {
 //            echo "<br>se encontro ".$value." veces de el caracter ". chr($key);
             if(chr($key) == $caracter){
                 $cont = $value;
+                echo "<br>Cedula: ".$string." del num arch ".$this->num_archivo." COnt: ".$cont;
             }
         }
 //        echo "<br>Cont ".$cont;
