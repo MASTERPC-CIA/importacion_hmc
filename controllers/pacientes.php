@@ -726,5 +726,94 @@ class Pacientes extends MX_Controller {
         }
         return $string;
     }
+    
+    /* Generar el codigo HC para los pacientes que no tienen cedula */
+
+    public function get_nuhc($nombres, $apellidos, $provincia_id, $nacionalidad, $fecha_nac) {
+        $codigo_nuhc = '';
+
+        /* Separamos los NOMBRES, primero y segundo */
+        $primer_nombre = $this->quitar_tildes($this->get_primer_nombre($nombres));
+        $segundo_nombre = $this->quitar_tildes($this->get_segundo_nombre($nombres));
+
+        /* Separamos los APELLIDOS, primero y segundo */
+        $primer_apellido = $this->quitar_tildes($this->get_primer_apellido($apellidos));
+        $segundo_apellido = $this->quitar_tildes($this->get_segundo_apellido($apellidos));
+
+//        print_r($array_nombre);
+
+        $siglas_nombres = substr($primer_nombre, 0, 2); //1 y 2 caracter: dos primeras siglas del primer nombre
+        $siglas_nombres .= substr($segundo_nombre, 0, 1); //3 caracter: primera letra del segundo nombre
+        $siglas_nombres .= substr($primer_apellido, 0, 2); //4 y 5 caracter: dos primeras letras del primer apellido
+        $siglas_nombres .= substr($segundo_apellido, 0, 1); //6 caracter: primera letra del primer apellido
+
+
+        /* Codigo de provincia extraido de bd */
+        //Si es extranjero se pone 99
+        if ($nacionalidad != 1) {
+            $codigo_provincia = '99';
+        } else {
+            $codigo_provincia = $this->ci->generic_model->get_val('bill_provincia', $provincia_id, 'codigoProv', 'idProvincia');
+        }
+
+        /* Anio de nacimiento 4 caracteres */
+        $anio_nac = date('Y', strtotime($fecha_nac));
+        /* Mes de nacimiento 4 caracteres */
+        $mes_nac = date('m', strtotime($fecha_nac));
+        /* Dia de nacimiento 4 caracteres */
+        $dia_nac = date('d', strtotime($fecha_nac));
+
+        /* Decada de nacimiento */
+        $control = substr($anio_nac, 2, 1);
+
+        /* Estructuramos el codigo */
+        $codigo_nuhc = strtoupper($siglas_nombres) . $codigo_provincia . $anio_nac . $mes_nac . $dia_nac . $control;
+
+        return $codigo_nuhc;
+    }
+
+    /* El codigo nuch requiere que se quiten las tildes de los caracteres de nombres y apellidos */
+
+    function quitar_tildes($cadena) {
+        $no_permitidas = array("á", "é", "í", "ó", "ú", "Á", "É", "Í", "Ó", "Ú", "ñ", "À", "Ã", "Ì", "Ò", "Ù", "Ã™", "Ã ", "Ã¨", "Ã¬", "Ã²", "Ã¹", "ç", "Ç", "Ã¢", "ê", "Ã®", "Ã´", "Ã»", "Ã‚", "ÃŠ", "ÃŽ", "Ã”", "Ã›", "ü", "Ã¶", "Ã–", "Ã¯", "Ã¤", "«", "Ò", "Ã", "Ã„", "Ã‹");
+        $permitidas = array("a", "e", "i", "o", "u", "A", "E", "I", "O", "U", "n", "N", "A", "E", "I", "O", "U", "a", "e", "i", "o", "u", "c", "C", "a", "e", "i", "o", "u", "A", "E", "I", "O", "U", "u", "o", "O", "i", "a", "e", "U", "I", "A", "E");
+        $texto = str_replace($no_permitidas, $permitidas, $cadena);
+        return $texto;
+    }
+    
+      function get_primer_nombre($nombres) {
+        $array_nombre = explode(chr(32), $nombres);
+        return $primer_nombre = $array_nombre[0];
+    }
+
+    function get_segundo_nombre($nombres) {
+        $array_nombre = explode(chr(32), $nombres);
+
+        //Si no tiene segundo nombre se guarda 0
+        if (sizeof($array_nombre) == 1) {
+            $segundo_nombre = '0';
+        } else if (sizeof($array_nombre) == 2) {//si tiene 2 nombres
+            $segundo_nombre = $array_nombre[1];
+        } else if (sizeof($array_nombre) == 3) {//si tiene 3 nombres (ej. Andres del cisne)
+            $segundo_nombre = $array_nombre[1] . ' ' . $array_nombre[2];
+        }
+        return $segundo_nombre;
+    }
+
+    function get_primer_apellido($apellidos) {
+        $array_apellido = explode(chr(32), $apellidos);
+        return $primer_apellido = $array_apellido[0];
+    }
+
+    function get_segundo_apellido($apellidos) {
+        $array_apellido = explode(chr(32), $apellidos);
+        //Si no tiene segundo apellido se guarda 0
+        if (sizeof($array_apellido) == 1) {
+            $segundo_apellido = '0';
+        } else {
+            return $segundo_apellido = $array_apellido[1];
+        }
+    }
+
 
 }
