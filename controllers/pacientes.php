@@ -387,14 +387,14 @@ class Pacientes extends MX_Controller {
         $string = trim($string);
         $string = substr($string, 0, 3);
         $encontrado = false;
-        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
+//        echo tagcontent('script', '$("#p_subject").text("' . $subject . '")');
 
         if (empty($string)) {
             return '-1';
         }
 
         foreach ($list as $value) {
-            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
+//            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
                 $encontrado = true;
                 break;
@@ -421,7 +421,7 @@ class Pacientes extends MX_Controller {
         }
 
         foreach ($list as $value) {
-            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
+//            echo tagcontent('script', '$("#p_id").text("' . $value->id . '")');
             if (substr_compare($string, $value->nombre, 0, strlen($string), true) == 0) {
                 $encontrado = true;
 
