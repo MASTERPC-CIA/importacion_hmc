@@ -228,6 +228,14 @@ class Pacientes extends MX_Controller {
 
                 // Valido la cedula y asigno cedula ruc o pasaporte a la variable global para bque guarde en clientes
                 $this->PersonaComercio_cedulaRuc = $this->validar_cedula_ruc($cedula);
+                // Control de campos vacios
+                if(empty($tarifa)){
+                    $tarifa = '-1';
+                }
+                if(empty($nombre)&& empty($apellido)){
+                    continue;
+                }
+                
                 $data = array(
                     'PersonaComercio_cedulaRuc' => $this->PersonaComercio_cedulaRuc,
                     'es_pasaporte' => $this->es_pasaporte,
@@ -485,6 +493,10 @@ class Pacientes extends MX_Controller {
         $es_issfa = trim($es_issfa);
         $es_isspol = trim($es_isspol);
         $es_otros = trim($es_otros);
+        if(empty($convenio_id)){
+            $convenio_id = '-2';
+        }
+        
         //Si el convenio coincide del 1 - 9, se graba directo el id
         if ($convenio_id >= 1 && $convenio_id <= 9) {
             return $convenio_id;
@@ -508,6 +520,10 @@ class Pacientes extends MX_Controller {
     //del 1 - 8 los pares pasivos y los impares son activos
     // primero pasar que tarifa nos ea mayor a 8 
     function ver_estado_militar($id_tipocliente) {
+        trim($id_tipocliente);
+        if(empty($id_tipocliente)){
+            return $id_tipocliente = '-1';
+        }
         if ($id_tipocliente <= 8) {
             if ($id_tipocliente % 2 == 0) {
 //                echo "Pasivo";
@@ -729,6 +745,10 @@ class Pacientes extends MX_Controller {
     // Validamos la etnia si es un dato de labase de datos 
     function validar_etnia($petnica, $lista_etnia) {
         $petnica = trim($petnica);
+        if(empty($petnica)){
+            $petnica = '-1';
+            return $petnica;
+        }
 
         foreach ($lista_etnia as $key => $value) {
             if ($value->id == $petnica) {
