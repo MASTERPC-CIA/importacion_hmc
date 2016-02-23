@@ -810,7 +810,9 @@ class Pacientes extends MX_Controller {
 
         /* Estructuramos el codigo */
         $codigo_nuhc = strtoupper($siglas_nombres) . $codigo_provincia . $anio_nac . $mes_nac . $dia_nac . $control;
-
+        
+        
+//        echo "<br>Codico nuhc".$codigo_nuhc."<br>";
         return $codigo_nuhc;
     }
 
@@ -861,33 +863,41 @@ class Pacientes extends MX_Controller {
 
     // Validar cedula o ruc 
     function validar_cedula_ruc($clienteID) {
+        // valido que noe ste vacio
+        if (empty($clienteID)) {
+            // Lalamo a funciond e generar codigo nuhc
+            $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
+            $this->es_pasaporte = 1;
+            return $clienteID;
+        }
+        // Se tiene que validar primero si son solo ceros xq como tienen longitud de 10 los ahce pasar como cedulas 
+        $cont = $this->contar_n_caracteres($clienteID,0);
+        if($cont == strlen($clienteID)){
+            $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
+                 $this->es_pasaporte = 1;
+                 return $clienteID;
+        }else{
+            $caracteres_permitidos = $this->validar_caracteres_permitidos($clienteID);
+            if($caracteres_permitidos == false){
+                $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
+                 $this->es_pasaporte = 1;
+                 return $clienteID;
+            }
+        }
+        // valido cedula
         $cedRuc_valida = $this->docident->validarCedula($clienteID);
+        
+        
         if ($cedRuc_valida == false) {
+//                    echo "<br>Llamado funcion validar_cedula_ruc ".$clienteID." numarchivo ".$this->num_archivo;
             // valido q si no fue correcta la cedula valide por ruc 
             $cedRuc_valida = $this->docident->validarRucPersonaNatural($clienteID);
+            // Si no es Ruc es Pasaporte
             if ($cedRuc_valida == false) {
-//                    echo tagcontent('script', 'alertaError(" Cédula o Ruc Invalida")');
-//                    die();
-                // VALIDO SI TIENE DATOS SI TIENE DATOS ES PASAPORTE
-                if (empty($clienteID)) {
-                    // Lalamo a funciond e generar codigo nuhc
-                    $this->es_pasaporte = 1;
-                    $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
+                $this->es_pasaporte = 1;
+//                    echo "<br>Cedula cliente ".$clienteID."<br>"; 
                     return $clienteID;
-                } else {
-                    // validar que no tenga solo ceros 
-                    $cont = $this->contar_n_caracteres($clienteID,0);
-                    if($cont == strlen($clienteID)){
-                        $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
-                    }else{
-                        $caracteres_nopermitidos = $this->validar_caracteres_permitidos($clienteID);
-                        if($caracteres_nopermitidos == false){
-                            $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
-                        }
-                    }
-                    $this->es_pasaporte = 1;
-                    return $clienteID;
-                }
+                
             } else {
                 $this->es_pasaporte = 0;
                 return $clienteID;
@@ -902,11 +912,13 @@ class Pacientes extends MX_Controller {
     function contar_n_caracteres($string,$caracter) {
 //        echo $string."<br>";
         $cont = 0;
+//        echo "<br>cedula desde la funcion contar_n_caracteres ".$string;
+//        echo"<br>";
         foreach (count_chars($string, 1) as $key => $value) {
 //            echo "<br>se encontro ".$value." veces de el caracter ". chr($key);
             if(chr($key) == $caracter){
                 $cont = $value;
-                echo "<br>Cedula: ".$string." del num arch ".$this->num_archivo." COnt: ".$cont;
+//                echo "<br>Cedula: ".$string." del num arch ".$this->num_archivo." COnt: ".$cont." longitud ".  strlen($string." Paciente ".$this->apellido);
             }
         }
 //        echo "<br>Cont ".$cont;
