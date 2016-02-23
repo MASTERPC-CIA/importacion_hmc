@@ -25,6 +25,7 @@ class Pacientes extends MX_Controller {
     private $grado_list;
     private $unidades_list;
     private $tarifa_cliente_tipo_list;
+//    private $tipoidentificacion_list;
     private $archivo_name;
     private $row_file;
     private $es_pasaporte;
@@ -36,6 +37,7 @@ class Pacientes extends MX_Controller {
     private $nacionalidad_id;
     private $fecha_nac;
     private $num_archivo;
+    private $docidentificacion_id;
 
     function __construct() {
         parent::__construct();
@@ -57,6 +59,8 @@ class Pacientes extends MX_Controller {
         $this->unidades_list = $this->generic_model->get('unidad_ffaa', array('id >' => '0'), 'id, uni_nombre_abr nombre');
         // NOTA saco los tiposde clientes para saber cuales son activos pasivos y civiles
 //        $this->tarifa_cliente_tipo_list = $this->generic_model->get('billing_clientetipo', array('idclientetipo >' => '0'), 'idclientetipo id');
+//        //NOTA Esta lista es para identificar el tipod de identificacion del paciente 
+//        $this->grado_list = $this->generic_model->get('billing_docidentificaciontipo', array('id >' => '0'), 'id, nombre');
     }
 
     function index() {
@@ -239,6 +243,7 @@ class Pacientes extends MX_Controller {
                 $data = array(
                     'PersonaComercio_cedulaRuc' => $this->PersonaComercio_cedulaRuc,
                     'es_pasaporte' => $this->es_pasaporte,
+                    'docidentificacion_id' => $this->docidentificacion_id,
                     'nombres' => $nombre,
                     'apellidos' => $apellido,
                     'direccion' => $calle_pac,
@@ -831,7 +836,8 @@ class Pacientes extends MX_Controller {
         /* Estructuramos el codigo */
         $codigo_nuhc = strtoupper($siglas_nombres) . $codigo_provincia . $anio_nac . $mes_nac . $dia_nac . $control;
         
-        
+        // El codigo nuhc se lo tomará comoapsaporte
+            $this->docidentificacion_id = 3;
 //        echo "<br>Codico nuhc".$codigo_nuhc."<br>";
         return $codigo_nuhc;
     }
@@ -888,6 +894,7 @@ class Pacientes extends MX_Controller {
             // Lalamo a funciond e generar codigo nuhc
             $clienteID = $this->get_nuhc($this->nombre, $this->apellido, $this->provincia_id, $this->nacionalidad_id, $this->fecha_nac); //se envia las variables globales que necesite para esta funcion 
             $this->es_pasaporte = 1;
+            
             return $clienteID;
         }
         // Se tiene que validar primero si son solo ceros xq como tienen longitud de 10 los ahce pasar como cedulas 
@@ -919,10 +926,15 @@ class Pacientes extends MX_Controller {
                     return $clienteID;
                 
             } else {
+                // es Ruc
+                $this->docidentificacion_id = 1;
+                // es Ruc
                 $this->es_pasaporte = 0;
                 return $clienteID;
             }
         } else {
+            // Es cedula
+            $this->docidentificacion_id = 2;
             // Es cedula
             $this->es_pasaporte = 0;
             return $clienteID;
