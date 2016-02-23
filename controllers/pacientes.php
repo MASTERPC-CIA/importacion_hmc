@@ -246,6 +246,7 @@ class Pacientes extends MX_Controller {
                     $tarifa = '-1';
                 }
                 if(empty($nombre)&& empty($apellido)){
+                    $this->save_incidentes("Nombre y Apellidos Vacio", $x, "Campos Vacios Nombre y Apellido", $this->archivo_name, "billing_cliente", $numero);
                     continue;
                 }
                 
