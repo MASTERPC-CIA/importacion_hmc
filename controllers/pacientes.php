@@ -38,10 +38,19 @@ class Pacientes extends MX_Controller {
     private $fecha_nac;
     private $num_archivo;
     private $docidentificacion_id;
+    // Datos De tipo de Identificacion 
+    private $pasaporte;
+    private $ruc;
+    private $cedula;
+    
 
     function __construct() {
         parent::__construct();
         $this->load->library('docident'); // validacion de cedulas ruc etc
+        //doy datos delSRI a los documentos 
+        $this->ruc = 1;
+        $this->cedula = 2;
+        $this->pasaporte = 3;
         //NOTA  Nacionalidades tiene un formato de registro diferente en el excel
         $this->nacionalidades_list = $this->generic_model->get('nacionalidad', array('id >' => '0', 'id <' => '5'), 'id, SUBSTRING(nombre,1,3)nombre');
         $this->provincias_list = $this->generic_model->get('bill_provincia', null, 'idProvincia id, descripProv nombre, codigoProv codigo');
@@ -837,7 +846,7 @@ class Pacientes extends MX_Controller {
         $codigo_nuhc = strtoupper($siglas_nombres) . $codigo_provincia . $anio_nac . $mes_nac . $dia_nac . $control;
         
         // El codigo nuhc se lo tomará comoapsaporte
-            $this->docidentificacion_id = 3;
+            $this->docidentificacion_id = $this->pasaporte;
 //        echo "<br>Codico nuhc".$codigo_nuhc."<br>";
         return $codigo_nuhc;
     }
@@ -927,14 +936,14 @@ class Pacientes extends MX_Controller {
                 
             } else {
                 // es Ruc
-                $this->docidentificacion_id = 1;
+                $this->docidentificacion_id = $this->ruc;
                 // es Ruc
                 $this->es_pasaporte = 0;
                 return $clienteID;
             }
         } else {
             // Es cedula
-            $this->docidentificacion_id = 2;
+            $this->docidentificacion_id = $this->cedula;
             // Es cedula
             $this->es_pasaporte = 0;
             return $clienteID;
