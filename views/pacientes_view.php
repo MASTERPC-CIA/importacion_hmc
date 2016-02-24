@@ -17,7 +17,7 @@
 
 
                     echo Open('div', array('class' => 'col-md-3')); 
-                        echo tagcontent('button','Importar',array( 'id'=>'ajaxformbtn','name'=>'import_btn', 'data-target'=>'new_deposito_out','class'=>'btn btn-primary'));
+                        echo tagcontent('button',$name_btn,array( 'id'=>'ajaxformbtn','name'=>'import_btn', 'data-target'=>'new_deposito_out','class'=>'btn btn-primary'));
                     echo Close('div'); 
                     
                     echo  input(array('type' => 'hidden', 'name' => 'action', 

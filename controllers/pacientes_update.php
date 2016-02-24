@@ -13,7 +13,7 @@ if (!defined('BASEPATH'))
  *
  * @author satellite
  */
-class Pacientes extends MX_Controller {
+class Pacientes_update extends MX_Controller {
 
     private $nacionalidades_list;
     private $provincias_list;
@@ -74,8 +74,8 @@ class Pacientes extends MX_Controller {
 
     function index() {
         $res['title'] = 'Importar Pacientes';
-        $res1['url'] = base_url('importacion_hmc/pacientes/importar1');
-        $res1['name_btn'] = 'Importar';
+        $res1['url'] = base_url('importacion_hmc/pacientes_update/importar1');
+        $res1['name_btn'] = 'Actualizar';
         $res['view'] = $this->load->view('pacientes_view',$res1, TRUE);
         $res['slidebar'] = $this->load->view('slidebar_lte', '', TRUE);
         $this->load->view('common/templates/dashboard_lte', $res);
@@ -300,8 +300,14 @@ class Pacientes extends MX_Controller {
 //                    die();
 //                    break;
 //                }
+//                
+//                // ACTUALIZO LA ASEGURADORA 
+                    $id_aseguradora = $this->get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros);
+                    $ci_paciente = $this->PersonaComercio_cedulaRuc;
+                    $numero_archivo = $numero;
+                  $this->update_aseguradora_id($id_aseguradora,$numero_archivo,$ci_paciente);
 //                //Guardar values en la BD
-                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy1');
+//                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy1');
 //                echo $save_cheque;
                 if ($save_paciente <= 0) {
                     echo warning_msg('Ha ocurrido un problema al grabar');
@@ -513,6 +519,7 @@ class Pacientes extends MX_Controller {
         $es_otros = trim($es_otros);
         if(empty($convenio_id)){
             $convenio_id = '-2';
+            return $convenio_id;
         }
         
         //Si el convenio coincide del 1 - 9, se graba directo el id
@@ -980,6 +987,42 @@ class Pacientes extends MX_Controller {
 //           echo "El nombre de usuario $nombre_usuario no es válido<br>"; 
           return false; 
        }
+    }
+    
+    
+       // Actualiza la tabla de clientes elcampo  aseguradora 
+    function update_aseguradora_id($id_aseguradora,$numero_archivo,$ci_paciente) {
+        $this->db->trans_begin();
+        $update = array(
+            'aseguradora_id'=>$id_aseguradora
+        );
+        $where_data = array(
+            'PersonaComercio_cedulaRuc'=>$ci_paciente,
+            'num_archivo'=>$numero_archivo,
+        );
+        
+        $row_affect = $this->generic_model->update( 'billing_cliente_copy1', $update, $where_data );
+        
+        if($row_affect > 0){
+            
+        }else{
+            echo error_msg(' Nos e actualizo el registro del paciente '.$ci_paciente." numero de archivo ".$numero_archivo.' aseguradora id'.$id_aseguradora);
+            $this->db->trans_rollback();
+            die(); 
+        }
+        
+        /* **Finalizamos la transaccion** */
+            if ($this->db->trans_status() === FALSE)
+            {
+                echo warning_msg(' Ha ocurrido un problema, no se pudo completar la transaccion.');                
+                $this->db->trans_rollback();
+                die();
+            }
+            else
+            {
+//                echo success_msg(' EL PROCESO A TERMINADO CON EXITO');
+                $this->db->trans_commit();
+            }
     }
 
 }
