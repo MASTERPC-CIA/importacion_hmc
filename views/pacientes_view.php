@@ -1,5 +1,5 @@
 <?php
-	echo Open('form', array('id'=>'import_form', 'action'=>base_url('importacion_hmc/pacientes/importar1'),'method'=>'post'));
+	echo Open('form', array('id'=>'import_form', 'action'=>$url,'method'=>'post'));
 //	echo Open('form', array('id'=>'import_form', 'action'=>base_url('importacion_hmc/pacientes/importar1'),'method'=>'post'));
 //		echo tagcontent('h1','DEPOSITOS - Cheques',array('class'=>'titulos'));
         

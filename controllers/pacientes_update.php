@@ -305,15 +305,15 @@ class Pacientes_update extends MX_Controller {
                     $id_aseguradora = $this->get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros);
                     $ci_paciente = $this->PersonaComercio_cedulaRuc;
                     $numero_archivo = $numero;
-                  $this->update_aseguradora_id($id_aseguradora,$numero_archivo,$ci_paciente);
+                  $this->update_aseguradora_id($id_aseguradora,$numero_archivo,$nombre);
 //                //Guardar values en la BD
 //                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy1');
 //                echo $save_cheque;
-                if ($save_paciente <= 0) {
-                    echo warning_msg('Ha ocurrido un problema al grabar');
-                    $this->db->trans_rollback();
-                    die();
-                }
+//                if ($save_paciente <= 0) {
+//                    echo warning_msg('Ha ocurrido un problema al grabar');
+//                    $this->db->trans_rollback();
+//                    die();
+//                }
             }
         } else {
             echo error_info_msg('No se ha podido cargar el archivo .xlsx');
@@ -991,13 +991,14 @@ class Pacientes_update extends MX_Controller {
     
     
        // Actualiza la tabla de clientes elcampo  aseguradora 
-    function update_aseguradora_id($id_aseguradora,$numero_archivo,$ci_paciente) {
+    function update_aseguradora_id($id_aseguradora,$numero_archivo,$nombres) {
         $this->db->trans_begin();
         $update = array(
             'aseguradora_id'=>$id_aseguradora
         );
         $where_data = array(
-            'PersonaComercio_cedulaRuc'=>$ci_paciente,
+//            'PersonaComercio_cedulaRuc'=>$ci_paciente,
+            'nombres'=>$nombres,
             'num_archivo'=>$numero_archivo,
         );
         
@@ -1006,7 +1007,8 @@ class Pacientes_update extends MX_Controller {
         if($row_affect > 0){
             
         }else{
-            echo error_msg(' Nos e actualizo el registro del paciente '.$ci_paciente." numero de archivo ".$numero_archivo.' aseguradora id'.$id_aseguradora);
+            echo error_msg(' Nos e actualizo el registro del paciente '.$nombres." numero de archivo "
+                    .$numero_archivo.' aseguradora id'.$id_aseguradora. " de la fila excel ".$this->row_file);
             $this->db->trans_rollback();
             die(); 
         }
