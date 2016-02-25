@@ -307,7 +307,7 @@ class Pacientes extends MX_Controller {
 //                    break;
 //                }
 //                //Guardar values en la BD
-                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy1');
+                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy');
 //                echo $save_cheque;
                 if ($save_paciente <= 0) {
                     echo warning_msg('Ha ocurrido un problema al grabar');
@@ -521,6 +521,7 @@ class Pacientes extends MX_Controller {
         $es_otros = trim($es_otros);
         if(empty($convenio_id)){
             $convenio_id = '-2';
+            return $convenio_id;
         }
         
         //Si el convenio coincide del 1 - 9, se graba directo el id
