@@ -547,7 +547,7 @@ class Pacientes extends MX_Controller {
                 return '-2';
             }
         }
-        return $convenio_id;
+        return '-2';
 
     }
 
