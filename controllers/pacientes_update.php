@@ -43,6 +43,8 @@ class Pacientes_update extends MX_Controller {
     private $ruc;
     private $cedula;
     
+    //Contador actualizaciones
+    private $cont_updates;
 
     function __construct() {
         parent::__construct();
@@ -70,6 +72,8 @@ class Pacientes_update extends MX_Controller {
 //        $this->tarifa_cliente_tipo_list = $this->generic_model->get('billing_clientetipo', array('idclientetipo >' => '0'), 'idclientetipo id');
 //        //NOTA Esta lista es para identificar el tipod de identificacion del paciente 
 //        $this->grado_list = $this->generic_model->get('billing_docidentificaciontipo', array('id >' => '0'), 'id, nombre');
+        
+        $this->cont_updates = 0;
     }
 
     function index() {
@@ -169,8 +173,9 @@ class Pacientes_update extends MX_Controller {
         if ($this->db->trans_status() === FALSE) {
             echo warning_msg(' Ha ocurrido un problema, no se pudo completar la transaccion.');
             $this->db->trans_rollback();
+            DIE();
         } else {
-            echo success_msg(' EL PROCESO A TERMINADO CON EXITO');
+            echo success_msg(' EL PROCESO A TERMINADO CON EXITO. <br>MIGRADOS '.$this->cont_updates);
             $this->db->trans_commit();
         }
 
@@ -1029,9 +1034,10 @@ class Pacientes_update extends MX_Controller {
 //                print_r($data);
 //        }
 //        $row_affect = $this->generic_model->update( 'billing_cliente_copy1', $update, $where_data );
-        $row_affect = $this->generic_model->update( 'billing_cliente_copy1_copy', $update, $where_data );
+        $row_affect = $this->generic_model->update( 'billing_cliente_copy', $update, $where_data );
         
         if($row_affect > 0){
+            $this->cont_updates++;
             
         }else{
             echo error_msg(' No se actualizo el registro del paciente '.$nombres." numero de archivo "
