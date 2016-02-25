@@ -95,6 +95,18 @@ class Pacientes_update extends MX_Controller {
         
 //        $string = (int) $string;
 //        $string = strrpos($string,'0');
+        
+        $id_aseguradora ='-2';
+        $numero_archivo = 504;
+        $nombres = 'ROSA ENRIQUETA';
+        $apellido = 'LUZURIAGA VINTIMILLA';
+        
+        $id_aseguradora ='-2';
+        $numero_archivo = 4493;
+        $nombres = '';
+        $apellido = 'DELGADO MAISINCHO JOSE';
+        $this->update_aseguradora_id($id_aseguradora,$numero_archivo,$nombres,$apellido);
+        die();
         $cont = $this->contar_n_caracteres($string,0);
         
 //            echo "Este cedula tiene ".$cont." ceros";
@@ -305,7 +317,7 @@ class Pacientes_update extends MX_Controller {
                     $id_aseguradora = $this->get_aseguradoraId($convenio, $afiess, $afissfa, $afispol, $afotros);
                     $ci_paciente = $this->PersonaComercio_cedulaRuc;
                     $numero_archivo = $numero;
-                  $this->update_aseguradora_id($id_aseguradora,$numero_archivo,$nombre);
+                  $this->update_aseguradora_id($id_aseguradora,$numero_archivo,$nombre,$apellido);
 //                //Guardar values en la BD
 //                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy1');
 //                echo $save_cheque;
@@ -991,24 +1003,39 @@ class Pacientes_update extends MX_Controller {
     
     
        // Actualiza la tabla de clientes elcampo  aseguradora 
-    function update_aseguradora_id($id_aseguradora,$numero_archivo,$nombres) {
+    function update_aseguradora_id($id_aseguradora,$numero_archivo,$nombres,$apellido) {
         $this->db->trans_begin();
         $update = array(
             'aseguradora_id'=>$id_aseguradora
         );
         $where_data = array(
-//            'PersonaComercio_cedulaRuc'=>$ci_paciente,
+//            'PersonaComercio_cedulaRuc'=>  $this->PersonaComercio_cedulaRuc,
             'nombres'=>$nombres,
+            'apellidos'=>$apellido,
             'num_archivo'=>$numero_archivo,
         );
-        
-        $row_affect = $this->generic_model->update( 'billing_cliente_copy1', $update, $where_data );
+//        $data = $this->generic_model->get_data( 'billing_cliente_copy1_copy', $where_data, 'id,aseguradora_id',null,0, null );
+//        if(empty($data)){
+//            echo error_msg("No se encontro datos con el numero de archivo ".$numero_archivo
+//                    ." y nombre ".$nombres." para dar el id_aseguradora ".$id_aseguradora);
+//            die();
+//        }else{
+//            $lim = sizeof($data);
+//            if($lim > 1){
+//                echo error_msg(" registros encontrados fueron mas de 1 con esa coincidencia <br>");
+//                print_r($data);
+//                
+//            }
+//                print_r($data);
+//        }
+//        $row_affect = $this->generic_model->update( 'billing_cliente_copy1', $update, $where_data );
+        $row_affect = $this->generic_model->update( 'billing_cliente_copy1_copy', $update, $where_data );
         
         if($row_affect > 0){
             
         }else{
-            echo error_msg(' Nos e actualizo el registro del paciente '.$nombres." numero de archivo "
-                    .$numero_archivo.' aseguradora id'.$id_aseguradora. " de la fila excel ".$this->row_file);
+            echo error_msg(' No se actualizo el registro del paciente '.$nombres." numero de archivo "
+                    .$numero_archivo.' aseguradora id '.$id_aseguradora. " de la fila excel ".$this->row_file);
             $this->db->trans_rollback();
             die(); 
         }
