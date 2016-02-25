@@ -30,7 +30,7 @@ class Pacientes extends MX_Controller {
     private $row_file;
     private $es_pasaporte;
     private $PersonaComercio_cedulaRuc;
-    // Creo las variables para ocupar la funcion de nuhc
+    // Creo las variables para ocupar la funcion de nuhc AEJP
     private $nombre;
     private $apellido;
     private $provincia_id;
@@ -38,7 +38,7 @@ class Pacientes extends MX_Controller {
     private $fecha_nac;
     private $num_archivo;
     private $docidentificacion_id;
-    // Datos De tipo de Identificacion 
+    // Datos De tipo de Identificacion AEJP
     private $pasaporte;
     private $ruc;
     private $cedula;
@@ -170,7 +170,7 @@ class Pacientes extends MX_Controller {
 
         echo tagcontent('strong', 'Se ha terminado de cargar el listado de clientes', array('class' => 'text-success font20'));
     }
-
+// AEJP
     function get_pacientesdata_xls($xls_data, $upload_path) {
         if (file_exists('./uploads/' . $upload_path . "/" . $xls_data['file_name'])) {
             // Cargando la hoja de c�lculo
@@ -552,7 +552,7 @@ class Pacientes extends MX_Controller {
     }
 
     //del 1 - 8 los pares pasivos y los impares son activos
-    // primero pasar que tarifa nos ea mayor a 8 
+    // primero pasar que tarifa nos ea mayor a 8 AEJP
     function ver_estado_militar($id_tipocliente) {
         trim($id_tipocliente);
         if(empty($id_tipocliente)){
@@ -583,7 +583,7 @@ class Pacientes extends MX_Controller {
 
     // saco  el grado delpaciente si es militar saco del campo excel nomgra y si es familiar saco del nomgrat
     // Tambien de esta funcion saco la unidad si es militar saco del campo excel siguni y si es familiar saco del campo sigunit
-    // para estos se salen mas de una cooncidencia se tomará la ultima y en caso de nada se envia -2
+    // para estos se salen mas de una cooncidencia se tomará la ultima y en caso de nada se envia -2 AEJP
     function get_grado_id_unidad_id($tarifa, $grado_list = null, $nomgra = null, $nomgrat = null
     , $unidad_list = null, $siguni = null, $sigunit = null, $es_grado = 0/* si esta en sero significa q es unidad */, $num_arch_excel = 0) {
 
@@ -761,7 +761,7 @@ class Pacientes extends MX_Controller {
         }
     }
 
-    // verifico si la fecha esta en un formato dia-sep-12 si esta cuakquier otro valor remplazo x null o empty (aun x definir )
+    // verifico si la fecha esta en un formato dia-sep-12 si esta cuakquier otro valor remplazo x null o empty (aun x definir ) AEJP
     function verificar_fecha($string) {
         $array_fecha = explode('-', $string);
 //        print_r($string);
@@ -776,7 +776,7 @@ class Pacientes extends MX_Controller {
 //        echo $fecha_nac;
     }
 
-    // Validamos la etnia si es un dato de labase de datos 
+    // Validamos la etnia si es un dato de labase de datos AEJP
     function validar_etnia($petnica, $lista_etnia) {
         $petnica = trim($petnica);
         if(empty($petnica)){
@@ -792,7 +792,7 @@ class Pacientes extends MX_Controller {
             }
         }
     }
-
+// AEJP
     function campos_excel_vacios($string, $nombre_campo) {
         if (empty($string)) {
             $string = 'CAMPO ' . $nombre_campo . ' EXCEL VACIO';
@@ -916,7 +916,7 @@ class Pacientes extends MX_Controller {
         }
     }
 
-    // Validar cedula o ruc 
+    // Validar cedula o ruc AEJP
     function validar_cedula_ruc($clienteID) {
         // valido que noe ste vacio
         if (empty($clienteID)) {
@@ -969,7 +969,7 @@ class Pacientes extends MX_Controller {
             return $clienteID;
         }
     }
-    
+    // AEJP
     function contar_n_caracteres($string,$caracter) {
 //        echo $string."<br>";
         $cont = 0;
@@ -987,7 +987,7 @@ class Pacientes extends MX_Controller {
         
         return $cont;
     }
-    
+    // AEJP
     function validar_caracteres_permitidos($string){
         if (preg_match("/^[a-zA-Z0-9\-_]{1,}$/", $string)) { 
 //          echo "El nombre de usuario $nombre_usuario es correcto<br>"; 
