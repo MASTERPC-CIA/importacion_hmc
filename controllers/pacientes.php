@@ -531,17 +531,24 @@ class Pacientes extends MX_Controller {
         //Si esta vacio buscamos en los campos restantes
         else if (empty($convenio_id) || $convenio_id > 9) {
             if ($es_iess == 'VERDADERO') {
+                $convenio_id = '3';
                 return '3'; //Id 3: IESS, seguro voluntario
             } else if ($es_issfa == 'VERDADERO') {
+                $convenio_id = '1';
                 return '1'; //Id 1: Seguro ISSFA
             } else if ($es_isspol == 'VERDADERO') {
+                $convenio_id = '2';
                 return '2'; //Id 2: Seguro ISSPOL
             } else if ($es_otros == 'VERDADERO') {
+                $convenio_id = '-1';
                 return '-1'; //Id -1: Otros seguros
             } else {//Si no coincide ninguno enviamos -2: NINGUNA
+                $convenio_id = '-2';
                 return '-2';
             }
         }
+        return $convenio_id;
+
     }
 
     //del 1 - 8 los pares pasivos y los impares son activos
