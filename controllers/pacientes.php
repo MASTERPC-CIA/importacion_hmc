@@ -43,6 +43,8 @@ class Pacientes extends MX_Controller {
     private $ruc;
     private $cedula;
     
+    private $count_saves;
+    
 
     function __construct() {
         parent::__construct();
@@ -70,6 +72,9 @@ class Pacientes extends MX_Controller {
 //        $this->tarifa_cliente_tipo_list = $this->generic_model->get('billing_clientetipo', array('idclientetipo >' => '0'), 'idclientetipo id');
 //        //NOTA Esta lista es para identificar el tipod de identificacion del paciente 
 //        $this->grado_list = $this->generic_model->get('billing_docidentificaciontipo', array('id >' => '0'), 'id, nombre');
+        
+        //Contador de registros guardados
+        $this->count_saves = 0;
     }
 
     function index() {
@@ -137,7 +142,7 @@ class Pacientes extends MX_Controller {
         $config['max_size'] = '0';
         $config['max_width'] = '0';
         $config['max_height'] = '0';
-        ini_set('memory_limit', '512M');
+//        ini_set('memory_limit', '512M');
 
         $this->load->library('upload', $config);
 
@@ -157,8 +162,9 @@ class Pacientes extends MX_Controller {
         if ($this->db->trans_status() === FALSE) {
             echo warning_msg(' Ha ocurrido un problema, no se pudo completar la transaccion.');
             $this->db->trans_rollback();
+            die();
         } else {
-            echo success_msg(' EL PROCESO A TERMINADO CON EXITO');
+            echo success_msg(' EL PROCESO A TERMINADO CON EXITO. <br>'.$this->count_saves.' registros guardados');
             $this->db->trans_commit();
         }
 
@@ -307,6 +313,8 @@ class Pacientes extends MX_Controller {
                     echo warning_msg('Ha ocurrido un problema al grabar');
                     $this->db->trans_rollback();
                     die();
+                }else{
+                    $this->count_saves ++ ;
                 }
             }
         } else {
