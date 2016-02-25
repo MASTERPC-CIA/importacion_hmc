@@ -137,7 +137,7 @@ class Pacientes extends MX_Controller {
         $config['max_size'] = '0';
         $config['max_width'] = '0';
         $config['max_height'] = '0';
-        ini_set('memory_limit', '512M');
+//        ini_set('memory_limit', '512M');
 
         $this->load->library('upload', $config);
 
