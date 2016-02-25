@@ -539,7 +539,7 @@ class Pacientes_update extends MX_Controller {
             return $convenio_id;
         }
         //Si esta vacio buscamos en los campos restantes
-        else if (empty($convenio_id)) {
+        else if (empty($convenio_id)  || $convenio_id > 9) {
             if ($es_iess == 'VERDADERO') {
                 return '3'; //Id 3: IESS, seguro voluntario
             } else if ($es_issfa == 'VERDADERO') {
