@@ -309,7 +309,7 @@ class Pacientes extends MX_Controller {
 //                    break;
 //                }
 //                //Guardar values en la BD
-                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy1_copy1');
+                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy');
 //                echo $save_cheque;
                 if ($save_paciente <= 0) {
                     echo warning_msg('Ha ocurrido un problema al grabar');
