@@ -131,6 +131,8 @@ class Pacientes extends MX_Controller {
     }
 
     public function loadfromfile($upload_path) {
+//        set_time_limit(0);
+        ignore_user_abort(true);
         set_time_limit(0);
         $this->load->library('excel');
         $this->load->library('docident');
@@ -307,7 +309,7 @@ class Pacientes extends MX_Controller {
 //                    break;
 //                }
 //                //Guardar values en la BD
-                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy');
+                $save_paciente = $this->generic_model->save($data, 'billing_cliente_copy1_copy1');
 //                echo $save_cheque;
                 if ($save_paciente <= 0) {
                     echo warning_msg('Ha ocurrido un problema al grabar');
